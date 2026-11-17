@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestra Historia en el Tiempo — Álbum Espacial 3D</title>
+
+  <!-- Tipografías Editoriales y Temáticas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400;1,600&family=Dancing+Script:wght@500;700&family=Homemade+Apple&family=EB+Garamond:ital,wght@0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&family=Noto+Serif+JP:wght@600;900&family=Rye&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <!-- Librerías: GSAP + ScrollTrigger + Lenis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <style>
+    :root {
+      /* Escena 0: Intro Editorial */
+      --s0-bg: #0d0d0d;
+      --s0-ink: #f0ece1;
+      --s0-muted: #8c8577;
+
+      /* Escena 1: Tokyo Revengers */
+      --tr-paper: #e8e4d9;
+      --tr-ink: #0b0b0b;
+      --tr-gold: #c59b27;
+      --tr-gold-dark: #8f6d13;
+      --tr-crimson: #e2d4b7;
+
+      /* Escena 2: Escritura (Tinta, Papel y Pluma Fuente) */
+      --es-desk: #140d08;
+      --es-desk-mid: #2a1c12;
+      --es-paper: #f3ead7;
+      --es-paper-dark: #e2d4b7;
+      --es-ink: #1c2a4a;
+      --es-ink-sepia: #e2d4b7;
+      --es-rule: rgba(64, 104, 168, 0.28);
+      --es-margin: #e2d4b7;
+      --es-wax: #e2d4b7;
+      --es-nib: #c8a25a;
+
+      /* Escena 3: Spy x Family */
+      --sx-emerald: #0e2920;
+      --sx-emerald-dark: #071712;
+      --sx-brass: #b89958;
+      --sx-manila: #e6d3a7;
+      --sx-manila-dark: #cfb783;
+      --sx-cream: #f2ece1;
+      --sx-stamp: #e2d4b7;
+
+      /* Escena 4: La Bella y la Bestia */
+      --bb-midnight: #091124;
+      --bb-burgundy: #4a0e1e;
+      --bb-lead: #111111;
+      --bb-bronze: #c9a24d;
+      --bb-parchment: #f5ebd6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      background-color: #0d0d0d;
+      color: #f0ece1;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* Contenedor fantasma que otorga longitud física al scroll para impulsar el eje Z */
+    #scroll-proxy {
+      width: 100%;
+      height: 15500px;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* =========================================================================
+       TEXTURAS FÍSICAS Y FILTROS GLOBALES (SIN BRILLOS FALSOS)
+       ========================================================================= */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 900;
+      opacity: 0.14;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Viñeta cinematográfica física mate */
+    .matte-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 890;
+      background: radial-gradient(ellipse at center, transparent 58%, rgba(6, 5, 5, 0.72) 100%);
+    }
+
+    /* =========================================================================
+       FONDOS ATMOSFÉRICOS SINCRONIZADOS POR PROFUNDIDAD Z
+       ========================================================================= */
+    #stage-backgrounds {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-plate {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      will-change: opacity;
+    }
+
+    /* Escena 0: Carbón Mate Analógico */
+    #bg-scene-0 {
+      opacity: 1;
+      background-color: var(--s0-bg);
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    /* Escena 1: Papel Manga + Tinta China Diagonal + Screentone Dots Reales */
+    #bg-scene-1 {
+      background-color: var(--tr-paper);
+      background-image:
+        /* Trama de puntos de semitono (screentone manga dots) */
+        radial-gradient(var(--tr-ink) 1.5px, transparent 1.6px),
+        /* Corte diagonal de tinta china negra */
+        linear-gradient(118deg, var(--tr-ink) 0%, var(--tr-ink) 35%, transparent 35.1%, transparent 66.9%, var(--tr-ink) 67%, var(--tr-ink) 100%);
+      background-size: 10px 10px, 100% 100%;
+      background-position: 0 0, 0 0;
+    }
+    #bg-scene-1::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(118deg,
+        rgba(11,11,11,0.92) 0%,
+        rgba(11,11,11,0.88) 33%,
+        rgba(232,228,217,0.88) 33.2%,
+        rgba(232,228,217,0.92) 66.8%,
+        rgba(11,11,11,0.90) 67%,
+        rgba(11,11,11,0.96) 100%);
+    }
+
+    /* Escena 2: Escritorio de Escritor a la Luz de la Lámpara + Renglones de Cuaderno + Manchas de Tinta */
+    #bg-scene-2 {
+      background-color: #e2d4b7;
+      background-image:
+        /* Manchas de tinta salpicadas sobre el escritorio */
+        radial-gradient(circle at 14% 78%, rgba(28, 42, 74, 0.55) 0, rgba(28, 42, 74, 0.55) 26px, transparent 27px),
+        radial-gradient(circle at 17% 74%, rgba(28, 42, 74, 0.45) 0, rgba(28, 42, 74, 0.45) 8px, transparent 9px),
+        radial-gradient(circle at 88% 22%, rgba(28, 42, 74, 0.45) 0, rgba(28, 42, 74, 0.45) 18px, transparent 19px),
+        /* Línea de margen roja de cuaderno */
+        linear-gradient(90deg, transparent 0, transparent 9%, rgba(178, 46, 46, 0.22) 9%, rgba(178, 46, 46, 0.22) calc(9% + 2px), transparent calc(9% + 2px)),
+        /* Renglones azules de cuaderno */
+        repeating-linear-gradient(
+          0deg,
+          rgba(90, 130, 200, 0.07) 0px,
+          rgba(90, 130, 200, 0.07) 1px,
+          transparent 1px,
+          transparent 36px
+        ),
+        /* Luz cálida de lámpara de escritorio */
+        radial-gradient(ellipse at 50% 32%, #e2d4b7 0%, #e2d4b7 55%, #e2d4b7 100%);
+    }
+
+    /* Escena 3: Sastrería Verde Esmeralda Años 60 + Patrón Mid-Century Latón + Sombra Persiana Veneciana */
+    #bg-scene-3 {
+      background-color: var(--sx-emerald);
+      background-image:
+        /* Sombra proyectada de persiana veneciana diagonal */
+        repeating-linear-gradient(
+          -28deg,
+          rgba(4, 12, 9, 0.48) 0px,
+          rgba(4, 12, 9, 0.48) 22px,
+          transparent 22px,
+          transparent 50px
+        ),
+        /* Patrón geométrico Mid-Century Modern en latón fino */
+        linear-gradient(45deg, rgba(184, 153, 88, 0.09) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(184, 153, 88, 0.09) 1px, transparent 1px);
+      background-size: 100% 100%, 44px 44px, 44px 44px;
+    }
+
+    /* Escena 4: Piedra Azul Medianoche Real, Borgoña Aterciopelado y Plomo Gótico */
+    #bg-scene-4 {
+      background-color: var(--bb-midnight);
+      background-image:
+        radial-gradient(ellipse at 50% 35%, rgba(74, 14, 30, 0.72) 0%, rgba(9, 17, 36, 0.96) 72%),
+        linear-gradient(90deg, rgba(201, 162, 77, 0.06) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(201, 162, 77, 0.06) 1px, transparent 1px);
+      background-size: 100% 100%, 64px 64px, 64px 64px;
+    }
+
+    /* =========================================================================
+       MOTOR DE CÁMARA 3D (#viewport -> #camera-rig -> #world)
+       ========================================================================= */
+    #viewport {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 1200px;
+      perspective-origin: 50% 50%;
+      z-index: 10;
+    }
+
+    #camera-rig {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    #world {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Cada Escena en su coordenada Z exacta */
+    .scene-3d {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .scene-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    /* Coordenadas Z base de las 5 escenas */
+    #scene-0 { transform: translate3d(0px, 0px, 0px); }
+    #scene-1 { transform: translate3d(0px, 0px, -2500px); }
+    #scene-2 { transform: translate3d(0px, 0px, -5000px); }
+    #scene-3 { transform: translate3d(0px, 0px, -7500px); }
+    #scene-4 { transform: translate3d(0px, 0px, -10000px); }
+
+    /* Capas de Profundidad por Escena (+350px Frontal, 0px Media, -400px Fondo) */
+    .layer-front { transform: translateZ(350px); }
+    .layer-mid   { transform: translateZ(0px); }
+    .layer-back  { transform: translateZ(-400px); }
+
+    /* =========================================================================
+       SISTEMA DE TARJETAS FOTOGRÁFICAS 9:16 (250px x 444px) E INTERACCIÓN 3D
+       ========================================================================= */
+    .cards-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 68px;
+      transform-style: preserve-3d;
+      pointer-events: none;
+      position: relative;
+      z-index: 20;
+    }
+
+    .photo-card-slot {
+      width: 250px;
+      height: 444px;
+      aspect-ratio: 9 / 16;
+      position: relative;
+      transform-style: preserve-3d;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .photo-card-rig {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .photo-card-slot.is-flipped .photo-card-rig {
+      transform: translateZ(95px) rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .card-img-wrap {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.65s ease, filter 0.55s ease;
+    }
+
+    .photo-card-slot:hover .card-img-wrap img {
+      transform: scale(1.045);
+    }
+
+    /* =========================================================================
+       ESCENA 0: PORTAL DE ENTRADA (Z: 0px)
+       ========================================================================= */
+    .intro-frame {
+      width: 86vw;
+      height: 82vh;
+      border: 1px solid rgba(240, 236, 225, 0.24);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+    }
+
+    .intro-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: var(--s0-ink);
+      border-style: solid;
+    }
+    .intro-corner.tl { top: -1px; left: -1px; border-width: 3px 0 0 3px; }
+    .intro-corner.tr { top: -1px; right: -1px; border-width: 3px 3px 0 0; }
+    .intro-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 3px 3px; }
+    .intro-corner.br { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; }
+
+    .intro-meta-top {
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      right: 32px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--s0-muted);
+    }
+
+    .intro-split-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform-style: preserve-3d;
+      padding: 0 24px;
+    }
+
+    .intro-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #c59b27;
+      margin-bottom: 18px;
+    }
+
+    .intro-title-row {
+      display: flex;
+      gap: 28px;
+      font-family: 'Cinzel', serif;
+      font-weight: 800;
+      font-size: clamp(3.2rem, 6.2vw, 6.4rem);
+      letter-spacing: 0.12em;
+      color: var(--s0-ink);
+      line-height: 1;
+      transform-style: preserve-3d;
+    }
+
+    .intro-subtitle {
+      margin-top: 28px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.35rem, 2vw, 1.85rem);
+      color: #d6cfc2;
+      letter-spacing: 0.04em;
+    }
+
+    .intro-scroll-cue {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      color: var(--s0-muted);
+      text-transform: uppercase;
+    }
+
+    .intro-scroll-line {
+      width: 1px;
+      height: 54px;
+      background: rgba(240, 236, 225, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-scroll-line::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: #c59b27;
+      animation: scrollPulse 2.2s infinite ease-in-out;
+    }
+    @keyframes scrollPulse {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(200%); }
+    }
+
+    /* Callejón de viñetas de manga entre Z: -400px y Z: -2100px */
+    .manga-alley-frame {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      transform-style: preserve-3d;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6vw;
+    }
+
+    .alley-panel {
+      width: 240px;
+      height: 68vh;
+      background: #e8e4d9;
+      border: 5px solid #0b0b0b;
+      box-shadow: 12px 12px 0px #0b0b0b;
+      position: relative;
+      overflow: hidden;
+    }
+    .alley-panel.left { transform: rotateY(32deg) skewY(-4deg); }
+    .alley-panel.right { transform: rotateY(-32deg) skewY(4deg); }
+
+    /* =========================================================================
+       ESCENA 1: TOKYO REVENGERS (Z: -2500px)
+       ========================================================================= */
+    .tr-portal-wing {
+      position: absolute;
+      top: -4vh;
+      height: 108vh;
+      width: 270px;
+      background-color: var(--tr-ink);
+      border: 3px solid var(--tr-gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 36px 18px;
+      box-shadow: 14px 0 0 rgba(11,11,11,0.85);
+    }
+    .tr-portal-wing.left {
+      left: 0;
+      border-left: none;
+      transform-origin: left center;
+    }
+    .tr-portal-wing.right {
+      right: 0;
+      border-right: none;
+      box-shadow: -14px 0 0 rgba(11,11,11,0.85);
+      transform-origin: right center;
+    }
+
+    .tr-kanji-column {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      font-size: 2.3rem;
+      letter-spacing: 0.32em;
+      color: var(--tr-gold);
+      border-top: 2px solid var(--tr-gold);
+      border-bottom: 2px solid var(--tr-gold);
+      padding: 18px 0;
+    }
+
+    .tr-wing-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--tr-paper);
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+
+    /* Líneas cinéticas de velocidad (Speed lines SVG) */
+    .tr-speedlines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Reloj roto de fondo (Z: -2900px) */
+    .tr-clock-stage {
+      width: 760px;
+      height: 760px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .tr-scene-banner {
+      position: absolute;
+      top: 5.5vh;
+      left: 50%;
+      transform: translateX(-50%) skewX(-8deg);
+      background: var(--tr-ink);
+      border: 3px solid var(--tr-gold);
+      padding: 8px 28px;
+      z-index: 30;
+      box-shadow: 6px 6px 0px var(--tr-gold);
+      text-align: center;
+    }
+    .tr-scene-banner h2 {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.16em;
+      color: var(--tr-paper);
+      text-transform: uppercase;
+    }
+    .tr-scene-banner span {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      color: var(--tr-gold);
+    }
+
+    /* Viñetas 9:16 de Manga Cortadas a Cuchillo (Cero border-radius) */
+    #scene-1 .photo-card-slot:nth-child(1) { transform: skewY(-2.4deg) translateY(8px); }
+    #scene-1 .photo-card-slot:nth-child(2) { transform: skewY(1.8deg) translateY(-10px); }
+    #scene-1 .photo-card-slot:nth-child(3) { transform: skewY(-2deg) translateY(6px); }
+
+    .tr-card-front {
+      border-radius: 0 !important;
+      background: var(--tr-paper);
+      border: 4px solid var(--tr-ink);
+      box-shadow: 10px 12px 0px var(--tr-ink);
+      padding: 8px;
+    }
+
+    .tr-card-inner-gold {
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--tr-gold);
+      position: relative;
+      overflow: hidden;
+      background: var(--tr-ink);
+    }
+
+    #scene-1 .card-img-wrap img {
+      filter: grayscale(82%) contrast(128%) sepia(12%);
+    }
+    #scene-1 .photo-card-slot:hover .card-img-wrap img {
+      filter: grayscale(0%) contrast(106%) sepia(0%);
+    }
+
+    /* Etiqueta vertical estilo capítulo/onomatopeya de manga */
+    .tr-chapter-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--tr-ink);
+      color: var(--tr-paper);
+      border: 2px solid var(--tr-gold);
+      padding: 10px 6px;
+      writing-mode: vertical-rl;
+      font-family: 'Anton', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      z-index: 5;
+      box-shadow: 4px 4px 0px rgba(11,11,11,0.9);
+    }
+
+    .tr-caption-strip {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--tr-ink);
+      border-top: 3px solid var(--tr-gold);
+      padding: 10px 12px;
+      color: var(--tr-paper);
+    }
+    .tr-caption-strip h4 {
+      font-family: 'Anton', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--tr-gold);
+    }
+    .tr-caption-strip p {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--tr-paper);
+      margin-top: 2px;
+    }
+
+    /* Reverso Tokko-fuku Bordado en Oro Mate */
+    .tr-card-back {
+      border-radius: 0 !important;
+      background-color: var(--tr-ink);
+      border: 4px solid var(--tr-gold);
+      box-shadow: -10px 12px 0px #000;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: var(--tr-paper);
+      background-image: radial-gradient(rgba(197, 155, 39, 0.16) 1px, transparent 1px);
+      background-size: 12px 12px;
+    }
+    .tr-back-header {
+      border-bottom: 2px solid var(--tr-gold);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tr-back-header span {
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      color: var(--tr-gold);
+      font-size: 1.2rem;
+    }
+    .tr-back-body {
+      padding: 12px 4px;
+      text-align: left;
+    }
+    .tr-back-body h3 {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.08em;
+      color: var(--tr-gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .tr-back-body p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.12rem;
+      line-height: 1.55;
+      color: var(--tr-paper);
+    }
+    .tr-back-footer {
+      border-top: 1px solid rgba(197, 155, 39, 0.45);
+      padding-top: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--tr-gold);
+      letter-spacing: 0.18em;
+      text-align: right;
+    }
+
+    /* =========================================================================
+       ESCENA 2: ESCRITURA — TINTA, PAPEL Y PLUMA (Z: -5000px)
+       ========================================================================= */
+    .es-front-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transform-style: preserve-3d;
+    }
+
+    /* Plumas gigantes laterales (pluma fuente y pluma de ave) en Z: -4650px */
+    .es-giant-pen {
+      position: absolute;
+      top: 0;
+      height: 100vh;
+      width: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(14px 18px 16px rgba(0, 0, 0, 0.6));
+    }
+    .es-giant-pen svg { height: 94vh; width: auto; }
+    .es-giant-pen.left { left: 1vw; }
+    .es-giant-pen.right { right: 1vw; }
+    .es-giant-pen.left svg { transform: rotate(-8deg); }
+    .es-giant-pen.right svg { transform: rotate(8deg); }
+
+    /* Hileras de notas manuscritas colgadas con pinzas a 3 profundidades distintas en Z */
+    .es-notes-row {
+      position: absolute;
+      top: 0;
+      left: 6%;
+      width: 88%;
+      height: 170px;
+      pointer-events: none;
+      transform-style: preserve-3d;
+    }
+    .es-notes-row .es-string {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+    }
+    .es-note {
+      --r: 0deg;
+      position: absolute;
+      top: 30px;
+      width: 128px;
+      padding: 12px 10px 10px;
+      background-color: var(--es-paper);
+      background-image: repeating-linear-gradient(180deg, transparent 0, transparent 17px, var(--es-rule) 17px, var(--es-rule) 18px);
+      background-position: 0 8px;
+      box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.5);
+      font-family: 'Homemade Apple', cursive;
+      font-size: 11px;
+      line-height: 18px;
+      color: var(--es-ink);
+      text-align: center;
+      transform-origin: 50% -12px;
+      transform: rotate(var(--r));
+      animation: esNoteSway 4.8s ease-in-out infinite alternate;
+    }
+    .es-note:nth-child(odd) { animation-duration: 5.6s; animation-delay: -1.4s; }
+    /* Pinza de madera que sujeta la nota al hilo */
+    .es-note::before {
+      content: "";
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      width: 10px;
+      height: 26px;
+      margin-left: -5px;
+      background: linear-gradient(90deg, #9c7646, #d1ad78, #9c7646);
+      border-radius: 2px;
+      box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.45);
+    }
+    @keyframes esNoteSway {
+      from { transform: rotate(calc(var(--r) - 2.5deg)); }
+      to   { transform: rotate(calc(var(--r) + 2.5deg)); }
+    }
+    /* Coordenadas Z relativas a Escena 2 (-5000px):
+       +400px = -4600px, +250px = -4750px, +100px = -4900px */
+    .es-notes-row-1 { transform: translate3d(0, -14px, 400px); }
+    .es-notes-row-2 { transform: translate3d(0, 10px, 250px); }
+    .es-notes-row-3 { transform: translate3d(0, 34px, 100px); }
+
+    /* Gran Manuscrito Abierto en el Fondo (Z: -5400px) */
+    .es-manuscript {
+      width: 1060px;
+      height: 660px;
+      display: flex;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    .es-page {
+      width: 50%;
+      height: 100%;
+      background-color: var(--es-paper);
+      background-image:
+        /* Margen rojo */
+        linear-gradient(90deg, transparent 0, transparent 54px, var(--es-margin) 54px, var(--es-margin) 56px, transparent 56px),
+        /* Renglones azules cada 34px */
+        repeating-linear-gradient(180deg, transparent 0, transparent 33px, var(--es-rule) 33px, var(--es-rule) 34px);
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    .es-page svg {
+      position: absolute;
+      inset: 0;
+    }
+    .es-page.left-page {
+      transform-origin: right center;
+      border-radius: 10px 0 0 10px;
+      box-shadow:
+        inset -34px 0 40px -24px rgba(70, 45, 20, 0.55),
+        inset 0 0 70px rgba(120, 90, 40, 0.28),
+        -6px 0 0 -1px var(--es-paper-dark),
+        -11px 0 0 -2px #d3c29f,
+        0 24px 40px rgba(0, 0, 0, 0.8);
+    }
+    .es-page.right-page {
+      transform-origin: left center;
+      border-radius: 0 10px 10px 0;
+      box-shadow:
+        inset 34px 0 40px -24px rgba(70, 45, 20, 0.55),
+        inset 0 0 70px rgba(120, 90, 40, 0.28),
+        6px 0 0 -1px var(--es-paper-dark),
+        11px 0 0 -2px #d3c29f,
+        0 24px 40px rgba(0, 0, 0, 0.8);
+    }
+    /* Margen rojo reflejado en la página derecha */
+    .es-page.right-page {
+      background-image:
+        linear-gradient(270deg, transparent 0, transparent 54px, var(--es-margin) 54px, var(--es-margin) 56px, transparent 56px),
+        repeating-linear-gradient(180deg, transparent 0, transparent 33px, var(--es-rule) 33px, var(--es-rule) 34px);
+    }
+
+    /* Costura del lomo del cuaderno */
+    .es-spine {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      bottom: 18px;
+      width: 3px;
+      margin-left: -1.5px;
+      transform: translateZ(6px);
+      background: repeating-linear-gradient(180deg, #7a5532 0, #7a5532 12px, transparent 12px, transparent 26px);
+      z-index: 10;
+    }
+
+    /* Trazo de tinta que se "escribe" solo con el scroll (pathLength="1") */
+    .es-ink-stroke {
+      stroke-dasharray: 1 1;
+      stroke-dashoffset: 1;
+    }
+
+    /* Páginas de diario 9:16 con foto pegada con cinta washi */
+    /* 'flat' aplana los hijos rotados dentro de la cara para que no se vean en espejo al girar */
+    .card-face.es-card-front,
+    .card-face.es-card-back {
+      transform-style: flat;
+    }
+
+    #scene-2 .photo-card-slot:nth-child(1) { transform: rotate(-3deg) translateY(10px); }
+    #scene-2 .photo-card-slot:nth-child(2) { transform: rotate(1.5deg) translateY(-10px); }
+    #scene-2 .photo-card-slot:nth-child(3) { transform: rotate(3deg) translateY(12px); }
+
+    .es-card-front {
+      background-color: var(--es-paper);
+      background-image:
+        linear-gradient(90deg, transparent 0, transparent 22px, var(--es-margin) 22px, var(--es-margin) 23px, transparent 23px),
+        repeating-linear-gradient(180deg, transparent 0, transparent 21px, var(--es-rule) 21px, var(--es-rule) 22px);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(140, 100, 50, 0.2);
+      border-radius: 3px;
+      padding: 26px 16px 0 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .es-date {
+      position: absolute;
+      top: 7px;
+      right: 14px;
+      font-family: 'Special Elite', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--es-ink-sepia);
+    }
+
+    /* Foto revelada pegada en la página */
+    .es-photo-frame {
+      position: relative;
+      height: 290px;
+      background: #fffdf8;
+      padding: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.32);
+      transform: rotate(-1.6deg);
+    }
+    #scene-2 .photo-card-slot:nth-child(2) .es-photo-frame { transform: rotate(1.4deg); }
+
+    /* Cinta washi en las esquinas */
+    .es-tape {
+      position: absolute;
+      top: -9px;
+      width: 70px;
+      height: 22px;
+      background-color: rgba(238, 222, 186, 0.82);
+      background-image: repeating-linear-gradient(45deg, rgba(178, 46, 46, 0.35) 0, rgba(178, 46, 46, 0.35) 4px, transparent 4px, transparent 9px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+      z-index: 5;
+    }
+    .es-tape.tl { left: -20px; transform: rotate(-34deg); }
+    .es-tape.tr { right: -20px; transform: rotate(34deg); }
+
+    /* Pie de foto manuscrito, alineado con los renglones */
+    .es-caption {
+      margin-top: 18px;
+      font-family: 'Homemade Apple', cursive;
+      font-size: 12px;
+      line-height: 22px;
+      color: var(--es-ink);
+    }
+
+    .es-page-num {
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #8a7558;
+    }
+
+    /* Mancha de tinta decorativa */
+    .es-ink-blot {
+      position: absolute;
+      bottom: 22px;
+      right: 14px;
+      width: 34px;
+      height: 30px;
+      opacity: 0.85;
+    }
+
+    /* Reverso: Carta manuscrita en papel rayado */
+    .es-card-back {
+      background-color: #f6efdf;
+      background-image: repeating-linear-gradient(180deg, transparent 0, transparent 23px, var(--es-rule) 23px, var(--es-rule) 24px);
+      background-position: 0 12px;
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.75), inset 0 0 36px rgba(140, 100, 50, 0.22);
+      border-radius: 3px;
+      padding: 20px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: var(--es-ink);
+    }
+    .es-back-date {
+      font-family: 'Special Elite', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--es-ink-sepia);
+      text-align: right;
+    }
+    .es-card-back h3 {
+      font-family: 'Dancing Script', cursive;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--es-wax);
+      margin: 4px 0 6px;
+    }
+    .es-card-back p {
+      font-family: 'Dancing Script', cursive;
+      font-weight: 500;
+      font-size: 1.15rem;
+      line-height: 24px;
+      color: var(--es-ink);
+    }
+    .es-back-sign {
+      font-family: 'Homemade Apple', cursive;
+      font-size: 12px;
+      text-align: right;
+      color: var(--es-ink);
+    }
+    .es-back-footer {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: #8a7558;
+      border-top: 1px dashed rgba(59, 42, 26, 0.4);
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .es-wax-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #b83232, #6b1010);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* =========================================================================
+       ESCENA 3: SPY X FAMILY (Z: -7500px)
+       ========================================================================= */
+    /* Visor de cámara espía 35mm y carpetas manila en Z: -7150px (+350px) */
+    .sx-viewfinder-hud {
+      position: absolute;
+      inset: 32px;
+      border: 1px solid rgba(242, 236, 225, 0.35);
+      pointer-events: none;
+    }
+    .sx-vf-corner {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-color: var(--sx-brass);
+      border-style: solid;
+    }
+    .sx-vf-corner.tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; }
+    .sx-vf-corner.tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
+    .sx-vf-corner.bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; }
+    .sx-vf-corner.br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
+
+    .sx-vf-telemetry {
+      position: absolute;
+      top: 26px;
+      left: 68px;
+      right: 68px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Special Elite', monospace;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--sx-brass);
+    }
+
+    .sx-manila-wing {
+      position: absolute;
+      top: 6vh;
+      height: 88vh;
+      width: 190px;
+      background: var(--sx-manila);
+      border: 2px solid #9c8454;
+      box-shadow: 10px 14px 24px rgba(0,0,0,0.65);
+      padding: 24px 14px;
+      color: #1c1915;
+      font-family: 'Special Elite', monospace;
+    }
+    .sx-manila-wing.left {
+      left: -30px;
+      transform: rotate(2deg);
+    }
+    .sx-manila-wing.right {
+      right: -30px;
+      transform: rotate(-2deg);
+    }
+    .sx-manila-tab {
+      position: absolute;
+      top: 40px;
+      width: 34px;
+      height: 150px;
+      background: var(--sx-manila-dark);
+      border: 2px solid #9c8454;
+      writing-mode: vertical-rl;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+    }
+    .sx-manila-wing.left .sx-manila-tab { right: -34px; border-left: none; border-radius: 0 8px 8px 0; }
+    .sx-manila-wing.right .sx-manila-tab { left: -34px; border-right: none; border-radius: 8px 0 0 8px; }
+
+    /* Mapa Táctico Antiguo en el Fondo (Z: -7900px) */
+    .sx-tactical-board {
+      width: 980px;
+      height: 620px;
+      background-color: #d8c8a8;
+      border: 8px solid #302216;
+      box-shadow: inset 0 0 0 2px #786242, 0 24px 45px rgba(0,0,0,0.75);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hilo Rojo de Investigación en SVG conectando las 3 fotos 9:16 */
+    .sx-red-thread-svg {
+      position: absolute;
+      top: -40px;
+      left: -60px;
+      width: calc(100% + 120px);
+      height: 140px;
+      pointer-events: none;
+      z-index: 35;
+      transform: translateZ(18px);
+    }
+
+    /* Tarjetas 9:16: Fotografías de Vigilancia en Expediente Confidencial */
+    .sx-card-front {
+      background: var(--sx-manila);
+      border: 1px solid #a89060;
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.7);
+      padding: 12px 10px 10px 10px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* FIX Escena 3: las caras frente/reverso deben superponerse (position:absolute de .card-face).
+       Antes, el 'position: relative' de .sx-card-front / .sx-card-back las apilaba verticalmente
+       y al girar la tarjeta el reverso aparecía debajo de la foto. */
+    .card-face.sx-card-front,
+    .card-face.sx-card-back {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Evita que el alfiler, el clip y el sello del frente se vean en espejo al girar la tarjeta */
+    .sx-card-front .sx-pushpin,
+    .sx-card-front .sx-paperclip,
+    .sx-card-front .sx-red-stamp {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Fotografía revelada en cuarto oscuro (padding blanco crema requerido) */
+    .sx-darkroom-print {
+      background: var(--sx-cream);
+      padding: 10px 10px 38px 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.32);
+      width: 100%;
+      height: 345px;
+      position: relative;
+    }
+
+    /* Clip metálico realista en SVG en la esquina superior */
+    .sx-paperclip {
+      position: absolute;
+      top: -16px;
+      left: 22px;
+      width: 28px;
+      height: 62px;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    /* Alfiler rojo donde se ata el hilo de investigación */
+    .sx-pushpin {
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%) translateZ(12px);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #9e1b1b;
+      border: 2px solid #4a0808;
+      box-shadow: 2px 4px 6px rgba(0,0,0,0.55);
+      z-index: 30;
+    }
+
+    /* Sello en tinta roja desgastada */
+    .sx-red-stamp {
+      position: absolute;
+      bottom: 86px;
+      right: 8px;
+      transform: rotate(-8deg);
+      border: 3px solid var(--sx-stamp);
+      padding: 4px 8px;
+      font-family: 'Special Elite', monospace;
+      font-size: 11px;
+      color: var(--sx-stamp);
+      background: rgba(242, 236, 225, 0.88);
+      letter-spacing: 0.06em;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    /* Texto mecanografiado con barras negras de censura que se revelan al acercar el cursor */
+    .sx-typewriter-notes {
+      margin-top: 8px;
+      padding: 6px 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: #161513;
+      border-top: 1px dashed #8c7853;
+    }
+    .censor-bar {
+      background-color: #111111;
+      color: transparent;
+      padding: 0 4px;
+      transition: background-color 0.35s ease, color 0.35s ease;
+      border-radius: 1px;
+    }
+    .photo-card-slot:hover .censor-bar {
+      background-color: rgba(158, 27, 27, 0.16);
+      color: #9e1b1b;
+      font-weight: 600;
+    }
+
+    /* Reverso Expediente Clasificado WISE */
+    .sx-card-back {
+      background: var(--sx-cream);
+      border: 2px solid #8c7853;
+      box-shadow: 0 16px 28px rgba(0,0,0,0.75);
+      padding: 18px 16px;
+      color: #141413;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .sx-back-stamp {
+      align-self: flex-start;
+      border: 2px solid var(--sx-stamp);
+      color: var(--sx-stamp);
+      font-family: 'Special Elite', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      transform: rotate(-3deg);
+    }
+    .sx-card-back h3 {
+      font-family: 'Special Elite', monospace;
+      font-size: 1.15rem;
+      color: #111;
+      margin-top: 10px;
+      border-bottom: 1px solid #111;
+      padding-bottom: 6px;
+    }
+    .sx-card-back p {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: #222;
+    }
+    .sx-back-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      color: #555;
+      border-top: 1px solid #bbb;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* =========================================================================
+       ESCENA 4: LA BELLA Y LA BESTIA (Z: -10000px)
+       ========================================================================= */
+    .bb-gothic-portal {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Rosetón Gótico de Catedral en el Fondo (Z: -10400px) */
+    .bb-rose-window-stage {
+      width: 780px;
+      height: 780px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* La foto central en Escena 4 se ubica ligeramente más cerca (+60px en Z) */
+    #scene-4 .photo-card-slot:nth-child(2) {
+      transform: translateZ(60px);
+    }
+
+    /* Ventanales de Vitral Real en Arco Ojival / Románico */
+    .bb-card-front {
+      border-radius: 140px 140px 6px 6px;
+      background: #121726;
+      border: 4px solid var(--bb-bronze);
+      box-shadow:
+        inset 0 0 0 3px var(--bb-lead),
+        inset 0 0 0 5px rgba(201, 162, 77, 0.55),
+        0 20px 36px rgba(0, 0, 0, 0.85);
+      padding: 10px 10px 38px 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bb-vitral-arch-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 130px 130px 4px 4px;
+      border: 3px solid var(--bb-lead);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Entramado de plomo de vitral en la parte superior de la foto */
+    .bb-lead-tracery {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 135px;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .bb-card-plaque {
+      position: absolute;
+      bottom: 7px;
+      left: 16px;
+      right: 16px;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--bb-bronze);
+      text-transform: uppercase;
+    }
+
+    /* Reverso Vitral & Biblioteca Real */
+    .bb-card-back {
+      border-radius: 140px 140px 6px 6px;
+      background: radial-gradient(circle at 50% 30%, #4a0e1e 0%, #091124 90%);
+      border: 4px solid var(--bb-bronze);
+      box-shadow: inset 0 0 0 4px var(--bb-lead), 0 20px 36px rgba(0,0,0,0.85);
+      padding: 48px 18px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      color: var(--bb-parchment);
+    }
+    .bb-card-back h3 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.08rem;
+      color: var(--bb-bronze);
+      letter-spacing: 0.06em;
+    }
+    .bb-card-back p {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.55;
+      color: var(--bb-parchment);
+    }
+    .bb-back-footer {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--bb-bronze);
+      border-top: 1px solid rgba(201, 162, 77, 0.4);
+      padding-top: 8px;
+    }
+
+    /* Botón de Lacre Real Color Vino con Relieve en Bronce */
+    .bb-wax-seal-wrap {
+      position: absolute;
+      bottom: 4.5vh;
+      left: 50%;
+      transform: translateX(-50%) translateZ(85px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      z-index: 50;
+    }
+
+    .wax-seal-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(145deg, #6b1126, #3d0814);
+      border: 3px solid var(--bb-bronze);
+      padding: 10px 26px 10px 14px;
+      border-radius: 40px;
+      color: var(--bb-parchment);
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.75), inset 0 0 0 2px #29040c;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    .wax-seal-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      background: linear-gradient(145deg, #7d152d, #4a0a18);
+    }
+    .wax-emblem {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #8a1832 0%, #4d0919 85%);
+      border: 2px solid var(--bb-bronze);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel Decorative', serif;
+      color: var(--bb-bronze);
+      font-size: 15px;
+    }
+
+    /* =========================================================================
+       PLIEGO DE PERGAMINO EDITORIAL (MODAL CARTA FINAL DE CUMPLEAÑOS)
+       ========================================================================= */
+    #royal-letter-modal {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 8, 16, 0.86);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #royal-letter-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .parchment-scroll {
+      width: min(680px, 90vw);
+      max-height: 86vh;
+      overflow-y: auto;
+      background-color: var(--bb-parchment);
+      color: #1e1510;
+      border: 8px solid var(--bb-bronze);
+      box-shadow:
+        inset 0 0 0 3px var(--bb-burgundy),
+        inset 0 0 0 7px var(--bb-bronze),
+        0 30px 60px rgba(0, 0, 0, 0.9);
+      padding: 46px 52px;
+      position: relative;
+      transform: translateY(25px) scale(0.96);
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #royal-letter-modal.is-open .parchment-scroll {
+      transform: translateY(0) scale(1);
+    }
+
+    .parchment-scroll h2 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2rem;
+      color: var(--bb-burgundy);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .parchment-kicker {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: #6e5223;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .parchment-body p {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.28rem;
+      line-height: 1.72;
+      margin-bottom: 18px;
+      text-align: justify;
+    }
+    .parchment-signature {
+      margin-top: 32px;
+      text-align: right;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 1.55rem;
+      color: var(--bb-burgundy);
+    }
+    .parchment-actions {
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(74, 14, 30, 0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .parchment-btn {
+      background: var(--bb-burgundy);
+      color: var(--bb-parchment);
+      border: 2px solid var(--bb-bronze);
+      padding: 10px 22px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+    .parchment-btn:hover {
+      background: #2b0711;
+    }
+    .parchment-btn.secondary {
+      background: transparent;
+      color: var(--bb-burgundy);
+      border-color: var(--bb-burgundy);
+    }
+
+    /* =========================================================================
+       HUD INDICADOR DE PROFUNDIDAD Z Y NAVEGACIÓN DE CAPÍTULOS
+       ========================================================================= */
+    #depth-hud {
+      position: fixed;
+      bottom: 24px;
+      left: 28px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 850;
+      pointer-events: none;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .hud-readout {
+      background: rgba(13, 13, 13, 0.88);
+      border: 1px solid rgba(197, 155, 39, 0.45);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      pointer-events: auto;
+    }
+
+    .hud-z-coord {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: #c59b27;
+      min-width: 118px;
+    }
+
+    .hud-hint {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: #a8a093;
+      border-left: 1px solid rgba(255,255,255,0.18);
+      padding-left: 14px;
+    }
+
+    .hud-chapters {
+      display: flex;
+      gap: 6px;
+      background: rgba(13, 13, 13, 0.88);
+      border: 1px solid rgba(240, 236, 225, 0.22);
+      padding: 5px;
+      pointer-events: auto;
+    }
+
+    .hud-nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #8c8577;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      padding: 6px 11px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+    }
+    .hud-nav-btn:hover {
+      color: #f0ece1;
+      border-color: rgba(197, 155, 39, 0.4);
+    }
+    .hud-nav-btn.active {
+      background: #c59b27;
+      color: #0b0b0b;
+      font-weight: 600;
+    }
+
+    /* Etiqueta flotante superior de la escena activa */
+    .scene-top-title {
+      position: absolute;
+      top: 4.5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .es-header-badge {
+      position: relative;
+      background-color: var(--es-paper);
+      background-image: linear-gradient(90deg, transparent 0, transparent 18px, var(--es-margin) 18px, var(--es-margin) 19px, transparent 19px);
+      color: var(--es-ink);
+      font-family: 'Special Elite', monospace;
+      font-size: 1.02rem;
+      letter-spacing: 0.18em;
+      padding: 9px 30px 8px 34px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+      transform: rotate(-1deg);
+      white-space: nowrap;
+    }
+    .es-badge-sub {
+      display: block;
+      margin-top: 2px;
+      font-family: 'Homemade Apple', cursive;
+      font-size: 12px;
+      letter-spacing: 0;
+      color: var(--es-wax);
+    }
+    /* Cursor de máquina de escribir parpadeante */
+    .es-caret {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      margin-left: 6px;
+      vertical-align: -2px;
+      background: var(--es-ink);
+      animation: esCaretBlink 1s steps(1) infinite;
+    }
+    @keyframes esCaretBlink {
+      50% { opacity: 0; }
+    }
+    .bb-header-badge {
+      background: rgba(9, 17, 36, 0.92);
+      border: 2px solid var(--bb-bronze);
+      padding: 7px 26px;
+      color: var(--bb-bronze);
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.16em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Texturas físicas globales -->
+  <div class="grain-overlay"></div>
+  <div class="matte-vignette"></div>
+
+  <!-- Fondos Atmosféricos Materiales sincronizados con el Eje Z -->
+  <div id="stage-backgrounds">
+    <div id="bg-scene-0" class="bg-plate"></div>
+    <div id="bg-scene-1" class="bg-plate"></div>
+    <div id="bg-scene-2" class="bg-plate"></div>
+    <div id="bg-scene-3" class="bg-plate"></div>
+    <div id="bg-scene-4" class="bg-plate"></div>
+  </div>
+
+  <!-- =========================================================================
+       ESCENARIO 3D FIJO (#viewport -> #camera-rig -> #world)
+       ========================================================================= -->
+  <div id="viewport">
+    <div id="camera-rig">
+      <div id="world">
+
+        <!-- ===================================================================
+             ESCENA 0: PORTAL DE ENTRADA (Z: 0px)
+             =================================================================== -->
+        <section id="scene-0" class="scene-3d">
+          <div class="scene-layer layer-mid">
+            <div class="intro-frame" id="intro-portal-frame">
+              <div class="intro-corner tl"></div>
+              <div class="intro-corner tr"></div>
+              <div class="intro-corner bl"></div>
+              <div class="intro-corner br"></div>
+
+              <div class="intro-meta-top">
+                <span>PROYECCIÓN ESPACIAL</span>
+                <span>FELIZ PUMPEEEEE</span>
+                <span>4 UNIVERSOS Y 12 MEMORIAS</span>
+              </div>
+
+              <div class="intro-split-container">
+                <div class="intro-kicker" id="intro-kicker">BIENVENIDA AMORCITOO A ESTE ALBUM</div>
+                <h1 class="intro-title-row">
+                  <span id="intro-word-left">FELIZ</span>
+                  <span id="intro-word-right">PUMPEEEEE</span>
+                </h1>
+                <p class="intro-subtitle" id="intro-sub">
+                  "DESLIZA LA RUEDA DEL MOUSE PARA AVANZAR COAZON"
+                </p>
+
+                <div class="intro-scroll-cue" id="intro-cue">
+                  <span>DESPLAZA COMO SI HICIERAS ZOOM</span>
+                  <div class="intro-scroll-line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Callejón de Viñetas de Manga entre Z: 0 y Z: -2500px -->
+          <div class="manga-alley-frame" style="transform: translateZ(-750px);">
+            <div class="alley-panel left">
+              <svg width="100%" height="100%" viewBox="0 0 240 500" preserveAspectRatio="none">
+                <line x1="0" y1="120" x2="240" y2="60" stroke="#0b0b0b" stroke-width="6"/>
+                <line x1="0" y1="340" x2="240" y2="390" stroke="#0b0b0b" stroke-width="6"/>
+                <text x="120" y="250" text-anchor="middle" font-family="Noto Serif JP" font-weight="900" font-size="42" fill="#0b0b0b">東京</text>
+              </svg>
+            </div>
+            <div class="alley-panel right">
+              <svg width="100%" height="100%" viewBox="0 0 240 500" preserveAspectRatio="none">
+                <line x1="0" y1="90" x2="240" y2="150" stroke="#0b0b0b" stroke-width="6"/>
+                <line x1="0" y1="380" x2="240" y2="310" stroke="#0b0b0b" stroke-width="6"/>
+                <text x="120" y="250" text-anchor="middle" font-family="Noto Serif JP" font-weight="900" font-size="42" fill="#0b0b0b">運命</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="manga-alley-frame" style="transform: translateZ(-1450px);">
+            <div class="alley-panel left">
+              <svg width="100%" height="100%" viewBox="0 0 240 500" preserveAspectRatio="none">
+                <line x1="0" y1="180" x2="240" y2="110" stroke="#0b0b0b" stroke-width="6"/>
+                <text x="120" y="290" text-anchor="middle" font-family="Noto Serif JP" font-weight="900" font-size="40" fill="#c59b27">時間</text>
+              </svg>
+            </div>
+            <div class="alley-panel right">
+              <svg width="100%" height="100%" viewBox="0 0 240 500" preserveAspectRatio="none">
+                <line x1="0" y1="130" x2="240" y2="210" stroke="#0b0b0b" stroke-width="6"/>
+                <text x="120" y="290" text-anchor="middle" font-family="Noto Serif JP" font-weight="900" font-size="40" fill="#c59b27">永遠</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             ESCENA 1: TOKYO REVENGERS (Z: -2500px)
+             =================================================================== -->
+        <section id="scene-1" class="scene-3d">
+          <!-- CAPA DE FONDO (Z: -2900px = -400px local): Engranaje de Reloj Roto -->
+          <div class="scene-layer layer-back" id="tr-back-layer">
+            <div class="tr-clock-stage">
+              <svg id="tr-clock-svg" width="740" height="740" viewBox="0 0 600 600">
+                <!-- Anillo exterior de engranaje fracturado -->
+                <g id="tr-gear-outer" stroke="#0b0b0b" stroke-width="4" fill="none">
+                  <circle cx="300" cy="300" r="260" stroke="#c59b27" stroke-width="3" stroke-dasharray="45 14 90 18"/>
+                  <circle cx="300" cy="300" r="236" stroke="#0b0b0b" stroke-width="8" stroke-dasharray="28 18"/>
+                  <circle cx="300" cy="300" r="198" stroke="#c59b27" stroke-width="2"/>
+                  <!-- Rayos geométricos del engranaje -->
+                  <line x1="300" y1="40" x2="300" y2="560" stroke="#c59b27" stroke-width="2"/>
+                  <line x1="40" y1="300" x2="560" y2="300" stroke="#c59b27" stroke-width="2"/>
+                  <line x1="116" y1="116" x2="484" y2="484" stroke="#0b0b0b" stroke-width="3" stroke-dasharray="15 10"/>
+                  <line x1="484" y1="116" x2="116" y2="484" stroke="#0b0b0b" stroke-width="3" stroke-dasharray="15 10"/>
+                  <!-- Numeración Romana -->
+                  <text x="300" y="88" text-anchor="middle" font-family="Cinzel" font-weight="800" font-size="24" fill="#c59b27">XII</text>
+                  <text x="515" y="308" text-anchor="middle" font-family="Cinzel" font-weight="800" font-size="24" fill="#c59b27">III</text>
+                  <text x="300" y="530" text-anchor="middle" font-family="Cinzel" font-weight="800" font-size="24" fill="#c59b27">VI</text>
+                  <text x="85" y="308" text-anchor="middle" font-family="Cinzel" font-weight="800" font-size="24" fill="#c59b27">IX</text>
+                </g>
+                <!-- Manecillas que giran hacia atrás con el scroll -->
+                <g id="tr-clock-hands">
+                  <line x1="300" y1="300" x2="300" y2="110" stroke="#c59b27" stroke-width="6"/>
+                  <polygon points="300,85 290,120 310,120" fill="#c59b27"/>
+                  <line x1="300" y1="300" x2="445" y2="300" stroke="#0b0b0b" stroke-width="8"/>
+                  <circle cx="300" cy="300" r="16" fill="#0b0b0b" stroke="#c59b27" stroke-width="4"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CAPA MEDIA (Z: -2500px = 0px local): Las 3 Fotos 9:16 -->
+          <div class="scene-layer layer-mid" id="tr-mid-layer">
+            <div class="tr-scene-banner">
+              <h2>TOKYO REVENGERS // SALTO TEMPORAL</h2>
+              <span>EN CUALQUIER LÍNEA DEL TIEMPO TE VOLVERÍA A ELEGIR</span>
+            </div>
+            <div class="cards-stage" id="cards-scene-1"></div>
+          </div>
+
+          <!-- CAPA FRONTAL (Z: -2150px = +350px local): Portal Tokko-fuku Bordado + Speed Lines -->
+          <div class="scene-layer layer-front">
+            <svg class="tr-speedlines" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+              <g stroke="#0b0b0b" stroke-width="2" opacity="0.32">
+                <line x1="0" y1="0" x2="420" y2="340"/>
+                <line x1="0" y1="180" x2="350" y2="410"/>
+                <line x1="0" y1="920" x2="420" y2="690"/>
+                <line x1="0" y1="1080" x2="480" y2="740"/>
+                <line x1="1920" y1="0" x2="1500" y2="340"/>
+                <line x1="1920" y1="220" x2="1560" y2="430"/>
+                <line x1="1920" y1="900" x2="1500" y2="680"/>
+                <line x1="1920" y1="1080" x2="1450" y2="730"/>
+              </g>
+            </svg>
+
+            <!-- Panel Izquierdo Tokko-fuku -->
+            <div class="tr-portal-wing left" id="tr-wing-left">
+              <!-- Bordado geométrico tradicional japonés en oro mate -->
+              <svg width="180" height="90" viewBox="0 0 180 90">
+                <rect x="4" y="4" width="172" height="82" fill="none" stroke="#c59b27" stroke-width="2.5"/>
+                <path d="M20,45 L50,15 L80,45 L50,75 Z M100,45 L130,15 L160,45 L130,75 Z" fill="none" stroke="#c59b27" stroke-width="2"/>
+                <circle cx="90" cy="45" r="14" fill="none" stroke="#c59b27" stroke-width="2.5"/>
+              </svg>
+              <div class="tr-kanji-column">運命・永遠</div>
+              <div class="tr-wing-tag">TOKKO-FUKU // PACTO INQUEBRANTABLE</div>
+            </div>
+
+            <!-- Panel Derecho Tokko-fuku -->
+            <div class="tr-portal-wing right" id="tr-wing-right">
+              <svg width="180" height="90" viewBox="0 0 180 90">
+                <rect x="4" y="4" width="172" height="82" fill="none" stroke="#c59b27" stroke-width="2.5"/>
+                <path d="M20,45 L50,15 L80,45 L50,75 Z M100,45 L130,15 L160,45 L130,75 Z" fill="none" stroke="#c59b27" stroke-width="2"/>
+                <circle cx="90" cy="45" r="14" fill="none" stroke="#c59b27" stroke-width="2.5"/>
+              </svg>
+              <div class="tr-kanji-column">初代・愛</div>
+              <div class="tr-wing-tag">SHIBUYA // LÍNEA TEMPORAL CERO</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             ESCENA 2: ESCRITURA — TINTA, PAPEL Y PLUMA (Z: -5000px)
+             =================================================================== -->
+        <section id="scene-2" class="scene-3d">
+          <!-- CAPA DE FONDO (Z: -5400px = -400px local): Gran Manuscrito Abierto -->
+          <div class="scene-layer layer-back" id="es-back-layer">
+            <div class="es-manuscript">
+              <div class="es-spine"></div>
+
+              <!-- Página Izquierda: Borrador manuscrito con tachones y correcciones -->
+              <div class="es-page left-page" id="es-page-left">
+                <svg width="100%" height="100%" viewBox="0 0 530 660">
+                  <text x="78" y="98" font-family="Dancing Script" font-weight="700" font-size="46" fill="#1c2a4a">Capítulo II</text>
+                  <text x="78" y="166" font-family="Homemade Apple" font-size="19" fill="#1c2a4a">Querida Fer:</text>
+                  <text x="78" y="234" font-family="Homemade Apple" font-size="16" fill="#1c2a4a">Hay historias que no se leen,</text>
+                  <text x="78" y="302" font-family="Homemade Apple" font-size="16" fill="#1c2a4a">se escriben juntos, página</text>
+                  <text x="78" y="370" font-family="Homemade Apple" font-size="16" fill="#1c2a4a">a página, con la misma tinta.</text>
+                  <!-- Frase con tachón y corrección en tinta roja -->
+                  <text x="78" y="438" font-family="Homemade Apple" font-size="16" fill="#1c2a4a">Te quiero</text>
+                  <text x="232" y="438" font-family="Homemade Apple" font-size="16" fill="#1c2a4a">mucho</text>
+                  <path d="M226,430 Q250,424 268,432 T304,428" fill="none" stroke="#1c2a4a" stroke-width="3"/>
+                  <path d="M262,446 L270,456 L278,446" fill="none" stroke="#8e1c1c" stroke-width="2"/>
+                  <text x="236" y="410" font-family="Homemade Apple" font-size="14" fill="#8e1c1c">infinito</text>
+                  <!-- Firma que se escribe sola con el scroll -->
+                  <path class="es-ink-stroke" pathLength="1"
+                        d="M300,540 C310,500 330,500 322,530 C316,555 300,560 312,540 C326,518 346,520 340,545 C336,560 352,556 362,536 C372,516 382,522 378,544 C376,556 392,552 402,532 Q420,500 440,548"
+                        fill="none" stroke="#1c2a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Manchas de tinta -->
+                  <circle cx="470" cy="610" r="9" fill="#1c2a4a" opacity="0.75"/>
+                  <circle cx="486" cy="600" r="3.5" fill="#1c2a4a" opacity="0.7"/>
+                  <circle cx="458" cy="596" r="2.5" fill="#1c2a4a" opacity="0.6"/>
+                  <text x="265" y="640" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-size="15" fill="#8a7558">— 24 —</text>
+                </svg>
+              </div>
+
+              <!-- Página Derecha: Plumín de pluma fuente dibujando un corazón -->
+              <div class="es-page right-page" id="es-page-right">
+                <svg width="100%" height="100%" viewBox="0 0 530 660">
+                  <text x="452" y="64" text-anchor="end" font-family="Special Elite" font-size="13" letter-spacing="3" fill="#3b2a1a">NOTAS AL MARGEN</text>
+                  <!-- Plumín dorado -->
+                  <g transform="translate(200 150) rotate(-28)">
+                    <path d="M-46,-120 L46,-120 C48,-50 30,20 0,110 C-30,20 -48,-50 -46,-120 Z" fill="#c8a25a" stroke="#3b2a1a" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M-46,-120 L46,-120 L42,-150 L-42,-150 Z" fill="#2a1c12" stroke="#3b2a1a" stroke-width="3"/>
+                    <circle cx="0" cy="-40" r="9" fill="#f3ead7" stroke="#3b2a1a" stroke-width="4"/>
+                    <line x1="0" y1="-31" x2="0" y2="108" stroke="#3b2a1a" stroke-width="3.5"/>
+                    <path d="M-28,-100 Q0,-86 28,-100" fill="none" stroke="#3b2a1a" stroke-width="2" opacity="0.6"/>
+                  </g>
+                  <!-- Trazo de tinta que sale del plumín y dibuja un corazón (se escribe con el scroll) -->
+                  <path class="es-ink-stroke" pathLength="1"
+                        d="M252,248 C280,300 300,330 300,360 C300,320 250,300 236,336 C222,372 270,410 300,440 C330,410 378,372 364,336 C350,300 300,320 300,360"
+                        fill="none" stroke="#1c2a4a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Gota de tinta -->
+                  <path d="M262,262 C258,270 256,276 262,280 C268,276 266,270 262,262 Z" fill="#1c2a4a"/>
+                  <text x="265" y="506" text-anchor="middle" font-family="Homemade Apple" font-size="17" fill="#1c2a4a">Lo mejor aún está</text>
+                  <text x="265" y="574" text-anchor="middle" font-family="Homemade Apple" font-size="17" fill="#1c2a4a">por escribirse…</text>
+                  <text x="265" y="640" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-size="15" fill="#8a7558">— 25 —</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- CAPA MEDIA (Z: -5000px = 0px local): Las 3 Fotos 9:16 como Páginas de Diario -->
+          <div class="scene-layer layer-mid" id="es-mid-layer">
+            <div class="scene-top-title">
+              <div class="es-header-badge">
+                TINTA Y PAPEL // LO QUE ESCRIBIMOS JUNTOS<span class="es-caret"></span>
+                <span class="es-badge-sub">cada recuerdo merece su propia página</span>
+              </div>
+            </div>
+            <div class="cards-stage" id="cards-scene-2"></div>
+          </div>
+
+          <!-- CAPA FRONTAL (Z: -4650px y Notas Colgantes en -4600px, -4750px, -4900px) -->
+          <div class="scene-layer es-front-frame">
+            <!-- Hilera 1 de notas manuscritas en Z: -4600px (+400px local) -->
+            <div class="es-notes-row es-notes-row-1" id="es-notes-1">
+              <svg class="es-string" viewBox="0 0 1000 40" preserveAspectRatio="none">
+                <path d="M0,16 Q500,30 1000,16" fill="none" stroke="#c8a25a" stroke-width="2"/>
+              </svg>
+              <div class="es-note" style="left: 3%; --r: -4deg;">te elegiría<br/>en cada página</div>
+              <div class="es-note" style="left: 27%; --r: 3deg;">punto y seguido,<br/>nunca final</div>
+              <div class="es-note" style="left: 58%; --r: -2deg;">tu risa es mi<br/>frase favorita</div>
+              <div class="es-note" style="left: 84%; --r: 5deg;">P.D.<br/>te amo</div>
+            </div>
+
+            <!-- Hilera 2 de notas manuscritas en Z: -4750px (+250px local) -->
+            <div class="es-notes-row es-notes-row-2" id="es-notes-2">
+              <svg class="es-string" viewBox="0 0 1000 40" preserveAspectRatio="none">
+                <path d="M0,16 Q500,28 1000,16" fill="none" stroke="#c8a25a" stroke-width="1.6"/>
+              </svg>
+              <div class="es-note" style="left: 14%; --r: 4deg;">capítulo nuevo:<br/>tu cumpleaños</div>
+              <div class="es-note" style="left: 72%; --r: -5deg;">sin borradores<br/>contigo</div>
+            </div>
+
+            <!-- Hilera 3 de notas manuscritas en Z: -4900px (+100px local) -->
+            <div class="es-notes-row es-notes-row-3" id="es-notes-3">
+              <svg class="es-string" viewBox="0 0 1000 40" preserveAspectRatio="none">
+                <path d="M0,16 Q500,26 1000,16" fill="none" stroke="#c8a25a" stroke-width="1.4"/>
+              </svg>
+              <div class="es-note" style="left: 40%; --r: -2deg;">querida Fer…</div>
+            </div>
+
+            <!-- Plumas gigantes laterales en Z: -4650px (+350px local) -->
+            <div class="scene-layer layer-front">
+              <!-- Pluma fuente -->
+              <div class="es-giant-pen left" id="es-pen-left">
+                <svg viewBox="0 0 120 1000">
+                  <defs>
+                    <linearGradient id="esBarrel" x1="0" x2="1" y1="0" y2="0">
+                      <stop offset="0" stop-color="#0e1526"/>
+                      <stop offset="0.45" stop-color="#2c3f6b"/>
+                      <stop offset="1" stop-color="#0e1526"/>
+                    </linearGradient>
+                    <linearGradient id="esGold" x1="0" x2="1" y1="0" y2="0">
+                      <stop offset="0" stop-color="#8f6d2e"/>
+                      <stop offset="0.5" stop-color="#e3c27e"/>
+                      <stop offset="1" stop-color="#8f6d2e"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Capuchón y cuerpo -->
+                  <rect x="28" y="20" width="64" height="560" rx="32" fill="url(#esBarrel)" stroke="#070b14" stroke-width="2"/>
+                  <rect x="28" y="300" width="64" height="12" fill="url(#esGold)"/>
+                  <rect x="28" y="520" width="64" height="16" fill="url(#esGold)"/>
+                  <!-- Clip -->
+                  <rect x="84" y="46" width="12" height="250" rx="6" fill="url(#esGold)" stroke="#5e461c" stroke-width="1.5"/>
+                  <circle cx="90" cy="290" r="8" fill="url(#esGold)" stroke="#5e461c" stroke-width="1.5"/>
+                  <!-- Sección de agarre -->
+                  <path d="M32,580 L88,580 L80,760 L40,760 Z" fill="#111" stroke="#070b14" stroke-width="2"/>
+                  <!-- Plumín -->
+                  <path d="M40,760 L80,760 C84,830 72,890 60,965 C48,890 36,830 40,760 Z" fill="url(#esGold)" stroke="#5e461c" stroke-width="2"/>
+                  <circle cx="60" cy="812" r="5" fill="#111"/>
+                  <line x1="60" y1="817" x2="60" y2="962" stroke="#5e461c" stroke-width="2"/>
+                  <!-- Gota de tinta -->
+                  <path d="M60,972 C56,980 54,986 60,992 C66,986 64,980 60,972 Z" fill="#1c2a4a"/>
+                </svg>
+              </div>
+
+              <!-- Pluma de ave (quill) -->
+              <div class="es-giant-pen right" id="es-pen-right">
+                <svg viewBox="0 0 160 1000">
+                  <!-- Vexilo de la pluma -->
+                  <path d="M84,900 C60,720 20,520 36,300 C46,170 70,80 104,20 C118,140 140,320 128,520 C120,680 104,800 84,900 Z" fill="#efe6d2" stroke="#8a7558" stroke-width="2.5"/>
+                  <!-- Barbas -->
+                  <g stroke="#b9a684" stroke-width="1.6" fill="none">
+                    <path d="M92,160 Q70,170 56,200"/>
+                    <path d="M90,240 Q64,250 44,290"/>
+                    <path d="M88,330 Q60,340 40,384"/>
+                    <path d="M88,420 Q62,432 44,478"/>
+                    <path d="M86,510 Q64,524 52,566"/>
+                    <path d="M86,600 Q68,616 60,656"/>
+                    <path d="M94,180 Q112,196 122,236"/>
+                    <path d="M92,280 Q116,296 128,346"/>
+                    <path d="M90,380 Q114,398 128,452"/>
+                    <path d="M88,480 Q110,500 122,556"/>
+                    <path d="M86,580 Q104,602 112,650"/>
+                  </g>
+                  <!-- Muescas en la pluma -->
+                  <path d="M38,360 L56,372 M44,520 L62,526 M126,420 L110,432" stroke="#14100c" stroke-width="3"/>
+                  <!-- Raquis (eje central) -->
+                  <path d="M104,20 C96,260 88,600 80,960" fill="none" stroke="#6b5539" stroke-width="4" stroke-linecap="round"/>
+                  <!-- Punta entintada -->
+                  <path d="M76,930 L84,930 L80,985 Z" fill="#1c2a4a"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             ESCENA 3: SPY X FAMILY (Z: -7500px)
+             =================================================================== -->
+        <section id="scene-3" class="scene-3d">
+          <!-- CAPA DE FONDO (Z: -7900px = -400px local): Mapa Táctico y Emblema WISE -->
+          <div class="scene-layer layer-back" id="sx-back-layer">
+            <div class="sx-tactical-board">
+              <svg width="100%" height="100%" viewBox="0 0 980 620">
+                <!-- Cuadrícula de coordenadas tácticas -->
+                <g stroke="#b5a17e" stroke-width="1">
+                  <line x1="0" y1="120" x2="980" y2="120"/>
+                  <line x1="0" y1="240" x2="980" y2="240"/>
+                  <line x1="0" y1="360" x2="980" y2="360"/>
+                  <line x1="0" y1="480" x2="980" y2="480"/>
+                  <line x1="196" y1="0" x2="196" y2="620"/>
+                  <line x1="392" y1="0" x2="392" y2="620"/>
+                  <line x1="588" y1="0" x2="588" y2="620"/>
+                  <line x1="784" y1="0" x2="784" y2="620"/>
+                </g>
+                <!-- Contornos topográficos sepia -->
+                <path d="M80,520 Q260,360 440,420 T880,180" fill="none" stroke="#856d47" stroke-width="3" stroke-dasharray="10 6"/>
+                <path d="M140,140 Q420,280 620,160 T910,440" fill="none" stroke="#856d47" stroke-width="2"/>
+
+                <!-- Emblema Geométrico de Inteligencia Retro (Ojo / Estrella de 4 puntas WISE) -->
+                <g transform="translate(490, 310)">
+                  <circle cx="0" cy="0" r="145" fill="none" stroke="#302216" stroke-width="3"/>
+                  <circle cx="0" cy="0" r="132" fill="none" stroke="#9e1b1b" stroke-width="1.5" stroke-dasharray="8 6"/>
+                  <path d="M-125,0 Q0,-85 125,0 Q0,85 -125,0 Z" fill="none" stroke="#302216" stroke-width="4"/>
+                  <polygon points="0,-95 22,-22 95,0 22,22 0,95 -22,22 -95,0 -22,-22" fill="#302216"/>
+                  <circle cx="0" cy="0" r="28" fill="#d8c8a8" stroke="#9e1b1b" stroke-width="4"/>
+                  <circle cx="0" cy="0" r="10" fill="#9e1b1b"/>
+                </g>
+
+                <!-- Alfileres y marcas de coordenadas en el mapa -->
+                <g fill="#9e1b1b">
+                  <circle cx="240" cy="210" r="7"/>
+                  <circle cx="730" cy="190" r="7"/>
+                  <circle cx="640" cy="450" r="7"/>
+                </g>
+                <line x1="240" y1="210" x2="490" y2="310" stroke="#9e1b1b" stroke-width="2" stroke-dasharray="5 5"/>
+                <line x1="730" y1="190" x2="490" y2="310" stroke="#9e1b1b" stroke-width="2" stroke-dasharray="5 5"/>
+                <line x1="640" y1="450" x2="490" y2="310" stroke="#9e1b1b" stroke-width="2" stroke-dasharray="5 5"/>
+
+                <text x="34" y="590" font-family="Special Elite" font-size="16" fill="#302216">
+                  DIVISIÓN ESTE // ARCHIVO DE VIGILANCIA CONJunta — BERLINT 1962
+                </text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CAPA MEDIA (Z: -7500px = 0px local): Las 3 Fotos 9:16 + Hilo Rojo 3D -->
+          <div class="scene-layer layer-mid" id="sx-mid-layer">
+            <div class="cards-stage" id="cards-scene-3">
+              <!-- Hilo Rojo de Investigación en SVG que une físicamente los alfileres de las 3 fotos -->
+              <svg class="sx-red-thread-svg" viewBox="0 0 1000 140" preserveAspectRatio="none">
+                <path d="M 185,46 Q 342,96 500,46 Q 658,92 815,46" fill="none" stroke="#9e1b1b" stroke-width="3.5"/>
+                <path d="M 185,46 Q 342,102 500,46 Q 658,98 815,46" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="2" transform="translate(0, 5)"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CAPA FRONTAL (Z: -7150px = +350px local): Visor 35mm y Carpetas Manila -->
+          <div class="scene-layer layer-front">
+            <div class="sx-viewfinder-hud">
+              <div class="sx-vf-corner tl"></div>
+              <div class="sx-vf-corner tr"></div>
+              <div class="sx-vf-corner bl"></div>
+              <div class="sx-vf-corner br"></div>
+              <div class="sx-vf-telemetry">
+                <span>ISO 400 // OP. STRIX-LOVE</span>
+                <span>LENTE 50MM F/1.4 — OSTANIA</span>
+                <span>EXPEDIENTE #004-WISE</span>
+              </div>
+            </div>
+
+            <div class="sx-manila-wing left" id="sx-wing-left">
+              <div class="sx-manila-tab">EXPEDIENTE A-01</div>
+              <p style="font-size:11px; border-bottom:1px solid #8c7853; padding-bottom:6px; margin-bottom:12px;">
+                AGENCIA WISE // DIVISIÓN ENCUBIERTA
+              </p>
+              <p style="font-size:10px; line-height:1.6;">
+                OBJETIVO:<br/>Proteger nuestra paz mundial juntos.<br/><br/>
+                ESTADO:<br/>Misión permanente de por vida.
+              </p>
+            </div>
+
+            <div class="sx-manila-wing right" id="sx-wing-right">
+              <div class="sx-manila-tab">CLASIFICADO TOP</div>
+              <p style="font-size:11px; border-bottom:1px solid #8c7853; padding-bottom:6px; margin-bottom:12px;">
+                PROTOCOLO: FAMILIA Y COMPLICIDAD
+              </p>
+              <p style="font-size:10px; line-height:1.6;">
+                NIVEL DE ACCESO:<br/>Exclusivo para mi persona favorita.<br/><br/>
+                CÓDIGO:<br/>STRIX-ETERNAL
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             ESCENA 4: LA BELLA Y LA BESTIA (Z: -10000px)
+             =================================================================== -->
+        <section id="scene-4" class="scene-3d">
+          <!-- CAPA DE FONDO (Z: -10400px = -400px local): Rosetón Gótico y Rosa en Campana de Cristal -->
+          <div class="scene-layer layer-back" id="bb-back-layer">
+            <div class="bb-rose-window-stage">
+              <svg width="760" height="760" viewBox="0 0 700 700">
+                <!-- Marco exterior de piedra y plomo del rosetón gótico -->
+                <circle cx="350" cy="350" r="320" fill="#091124" stroke="#c9a24d" stroke-width="6"/>
+                <circle cx="350" cy="350" r="306" fill="none" stroke="#111111" stroke-width="10"/>
+
+                <!-- Mosaicos radiales de vitral emplomado (Rubí, Zafiro, Esmeralda y Ámbar) -->
+                <g id="bb-rose-glass" stroke="#111111" stroke-width="5">
+                  <circle cx="350" cy="350" r="275" fill="#13264e"/>
+                  <circle cx="350" cy="350" r="220" fill="#4a0e1e"/>
+                  <circle cx="350" cy="350" r="165" fill="#0f382c"/>
+                  <!-- Nervaduras góticas de plomo -->
+                  <line x1="350" y1="30" x2="350" y2="670"/>
+                  <line x1="30" y1="350" x2="670" y2="350"/>
+                  <line x1="124" y1="124" x2="576" y2="576"/>
+                  <line x1="576" y1="124" x2="124" y2="576"/>
+                  <!-- Arcos ojivales perimetrales -->
+                  <circle cx="350" cy="95" r="28" fill="#c9a24d"/>
+                  <circle cx="350" cy="605" r="28" fill="#c9a24d"/>
+                  <circle cx="95" cy="350" r="28" fill="#c9a24d"/>
+                  <circle cx="605" cy="350" r="28" fill="#c9a24d"/>
+                  <circle cx="170" cy="170" r="24" fill="#8c1d40"/>
+                  <circle cx="530" cy="170" r="24" fill="#8c1d40"/>
+                  <circle cx="170" cy="530" r="24" fill="#8c1d40"/>
+                  <circle cx="530" cy="530" r="24" fill="#8c1d40"/>
+                </g>
+
+                <!-- Campana de Cristal y Rosa en Estilo Vitral Emplomado -->
+                <g stroke="#111111" stroke-width="4.5">
+                  <!-- Base de bronce de la cúpula -->
+                  <rect x="250" y="475" width="200" height="22" rx="4" fill="#c9a24d"/>
+                  <!-- Cúpula de cristal en arco -->
+                  <path d="M270,475 L270,290 A80,80 0 0,1 430,290 L430,475 Z" fill="rgba(26, 52, 94, 0.55)" stroke="#c9a24d" stroke-width="4"/>
+                  <!-- Tallo y hojas esmeralda -->
+                  <path d="M350,330 Q342,400 350,465" fill="none" stroke="#1b7a58" stroke-width="6"/>
+                  <path d="M350,395 Q315,375 305,400 Q328,415 350,395 Z" fill="#1b7a58"/>
+                  <path d="M350,415 Q385,395 395,420 Q372,435 350,415 Z" fill="#1b7a58"/>
+                  <!-- Corola de la Rosa Carmesí en Vitral -->
+                  <circle cx="350" cy="300" r="38" fill="#8f1429"/>
+                  <path d="M322,285 Q350,250 378,285 Q350,315 322,285 Z" fill="#b81d38"/>
+                  <path d="M315,305 Q350,340 385,305 Q350,285 315,305 Z" fill="#6e0d1d"/>
+                </g>
+
+                <!-- Pétalos cayendo con gravedad lenta y natural -->
+                <g id="bb-falling-petals">
+                  <path class="falling-petal" d="M325,355 C315,348 310,362 322,368 C332,364 332,358 325,355 Z" fill="#b81d38" stroke="#111" stroke-width="2"/>
+                  <path class="falling-petal" d="M375,380 C365,373 360,387 372,393 C382,389 382,383 375,380 Z" fill="#8f1429" stroke="#111" stroke-width="2"/>
+                  <path class="falling-petal" d="M335,425 C325,418 320,432 332,438 C342,434 342,428 335,425 Z" fill="#b81d38" stroke="#111" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CAPA MEDIA (Z: -10000px = 0px local): Las 3 Fotos en Vitral Ojival + Sello de Lacre -->
+          <div class="scene-layer layer-mid" id="bb-mid-layer">
+            <div class="scene-top-title">
+              <div class="bb-header-badge">LA BELLA Y LA BESTIA // VITRAL DE LA ETERNIDAD</div>
+            </div>
+
+            <div class="cards-stage" id="cards-scene-4"></div>
+
+            <!-- Lacre Real Color Vino con Relieve en Bronce -->
+            <div class="bb-wax-seal-wrap">
+              <button class="wax-seal-btn" id="open-letter-btn" type="button">
+                <span class="wax-emblem">R</span>
+                <span>Abrir la Carta de Cumpleaños</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CAPA FRONTAL (Z: -9650px = +350px local): Columnas y Arcos Góticos de Vitral Emplomado -->
+          <div class="scene-layer layer-front bb-gothic-portal">
+            <!-- Columna y Arco de Vitral Izquierdo -->
+            <svg id="bb-wing-left" style="position:absolute; left:0; top:0; height:100vh; width:310px;" viewBox="0 0 310 1000" preserveAspectRatio="none">
+              <path d="M0,0 L310,0 Q130,190 95,460 L95,1000 L0,1000 Z" fill="#091124" stroke="#c9a24d" stroke-width="5"/>
+              <!-- Mosaico de vitral emplomado superior -->
+              <path d="M12,12 L270,12 Q160,120 110,270 L12,270 Z" fill="#4a0e1e" stroke="#111111" stroke-width="6"/>
+              <path d="M12,12 L145,12 L90,145 L12,145 Z" fill="#133863" stroke="#111111" stroke-width="5"/>
+              <circle cx="70" cy="75" r="32" fill="#c9a24d" stroke="#111111" stroke-width="5"/>
+              <path d="M12,280 L90,280 L90,985 L12,985 Z" fill="#10182b" stroke="#c9a24d" stroke-width="3"/>
+            </svg>
+
+            <!-- Columna y Arco de Vitral Derecho -->
+            <svg id="bb-wing-right" style="position:absolute; right:0; top:0; height:100vh; width:310px;" viewBox="0 0 310 1000" preserveAspectRatio="none">
+              <path d="M310,0 L0,0 Q180,190 215,460 L215,1000 L310,1000 Z" fill="#091124" stroke="#c9a24d" stroke-width="5"/>
+              <path d="M298,12 L40,12 Q150,120 200,270 L298,270 Z" fill="#4a0e1e" stroke="#111111" stroke-width="6"/>
+              <path d="M298,12 L165,12 L220,145 L298,145 Z" fill="#133863" stroke="#111111" stroke-width="5"/>
+              <circle cx="240" cy="75" r="32" fill="#c9a24d" stroke="#111111" stroke-width="5"/>
+              <path d="M220,280 L298,280 L298,985 L220,985 Z" fill="#10182b" stroke="#c9a24d" stroke-width="3"/>
+            </svg>
+          </div>
+        </section>
+
+      </div><!-- /#world -->
+    </div><!-- /#camera-rig -->
+  </div><!-- /#viewport -->
+
+  <!-- =========================================================================
+       MODAL DE PERGAMINO REAL: CARTA DE CUMPLEAÑOS FINAL
+       ========================================================================= -->
+  <div id="royal-letter-modal" aria-hidden="true">
+    <div class="parchment-scroll">
+      <div class="parchment-kicker">EPÍLOGO // Z: -10,000M — BIBLIOTECA REAL</div>
+      <h2 id="letter-title">Feliz Cumpleaños, Mi Amor</h2>
+      <div class="parchment-body" id="letter-body"></div>
+      <div class="parchment-signature" id="letter-signature"></div>
+      <div class="parchment-actions">
+        <button type="button" class="parchment-btn secondary" id="close-letter-btn">Cerrar Pliego</button>
+        <button type="button" class="parchment-btn" id="rewind-journey-btn">Volver al Inicio del Viaje (Z: 0)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       HUD DISCRETO DE COORDENADAS Z Y NAVEGACIÓN ESPACIAL
+       ========================================================================= -->
+  <footer id="depth-hud">
+    <div class="hud-readout">
+      <span class="hud-z-coord" id="hud-z-text">Z: 00000 PX</span>
+      <span class="hud-hint">CLIC EN CUALQUIER FOTO 9:16 PARA GIRARLA (180°)</span>
+    </div>
+
+    <nav class="hud-chapters" aria-label="Capítulos en el eje Z">
+      <button type="button" class="hud-nav-btn active" data-target-progress="0">00. PORTAL</button>
+      <button type="button" class="hud-nav-btn" data-target-progress="0.23">01. TOKYO</button>
+      <button type="button" class="hud-nav-btn" data-target-progress="0.49">02. ESCRITURA</button>
+      <button type="button" class="hud-nav-btn" data-target-progress="0.75">03. MISIÓN</button>
+      <button type="button" class="hud-nav-btn" data-target-progress="0.98">04. ETERNIDAD</button>
+    </nav>
+  </footer>
+
+  <!-- Contenedor físico de scroll que controla la profundidad en Z -->
+  <div id="scroll-proxy"></div>
+
+  <!-- =========================================================================
+       LÓGICA DE DATOS (ALBUM_DATA) + MOTOR DE CÁMARA 3D EN EJE Z
+       ========================================================================= -->
+  <script>
+    /**
+     * =========================================================================
+     * 1. DICCIONARIO EDITABLE DE LAS 12 FOTOGRAFÍAS 9:16 Y CARTA FINAL
+     * =========================================================================
+     * Puedes reemplazar la propiedad `image` de cada tarjeta por la ruta local
+     * de tus fotos verticales 9:16 (ej. "./fotos/tokyo-01.jpg").
+     */
+    const ALBUM_DATA = {
+      scene1_tokyo: [
+        {
+          id: "tr-01",
+          image: "./imagenes/img-1.jpg",
+          tag: "CAPÍTULO 01: EL DESTINO",
+          title: "El Primer Cruce",
+          subtitle: "LÍNEA TEMPORAL ORIGINAL",
+          backTitle: "I. El Día que Todo Cambió",
+          backText: "Hay quienes dicen que las casualidades si existen. Yo digo que no: tú y yo nos encontramos porque estábamos destinados a hacerlo. o tal vez fue el destino quien nos encontró a nosotros.",
+          backFooter: "TOMO 01 // PÁG. 019"
+        },
+        {
+          id: "tr-02",
+          image: "./imagenes/img-2.jpg",
+          tag: "CAPÍTULO 02: EL PACTO",
+          title: "Espalda con Espalda",
+          subtitle: "JURAMENTO INQUEBRANTABLE",
+          backTitle: "II. Nuestra Propia ToMan",
+          backText: "No importa cuán difícil se ponga el mundo allá afuera; tú y yo somos nuestro propio equipo invencible, siempre voy a estar de tu lado cuidando tus sueños.",
+          backFooter: "TOMO 02 // PÁG. 084"
+        },
+        {
+          id: "tr-03",
+          image: "./imagenes/img-3.jpg",
+          tag: "CAPÍTULO 03: CUALQUIER LÍNEA TEMPORAL",
+          title: "Viaje Sin Fin",
+          subtitle: "MÁS ALLÁ DEL RELOJ",
+          backTitle: "III. Mil Veces Tú",
+          backText: "Si tuviera que saltar entre todas las lineas temporales posibles para salvarte, lo haria sin dudarlo y si amor si eres lo suficientemente friki para entenderlo.",
+          backFooter: "TOMO 03 // PÁG. 142"
+        }
+      ],
+
+      scene2_escritura: [
+        {
+          id: "es-01",
+          image: "./imagenes/img-4.jpg",
+          date: "DÍA 001",
+          page: "01",
+          caption: "El día que empezamos a escribir lo nuestro",
+          backTitle: "Primera página",
+          backText: "dicen que la primera página de un libro es la más difícil de escribir y tienen razon porque la tinta del mundo no es suficiente para escribir nuestra historia.",
+          backSignature: "— siempre contigo",
+          backFooter: "BORRADOR Nº 1 // TINTA AZUL"
+        },
+        {
+          id: "es-02",
+          image: "./imagenes/img-5.jpg",
+          date: "DÍA 247",
+          page: "02",
+          caption: "Tu risa de otro mundo, mi frase favorita",
+          backTitle: "sonrisa de otro mundo",
+          backText: "verte sonreir me alegra un mal dia, porque tu risa es la mejor frase que he leido en toda mi vida y quiero leerla todos los dias.",
+          backSignature: "— con todo mi cariño",
+          backFooter: "BORRADOR Nº 2 // TINTA SEPIA"
+        },
+        {
+          id: "es-03",
+          image: "./imagenes/img-6.jpeg",
+          date: "DÍA ∞",
+          page: "03",
+          caption: "Punto y seguido, nunca punto final",
+          backTitle: "Continuará…",
+          backText: "Amor ni creas que te escaparas de mi MUEJEJEJE porque nuestra historia no tiene punto final, solo un punto y seguido que nos lleva a escribirla juntos para siempre.",
+          backSignature: "— para siempre, tu otra mitad (No es amenaza o si? MUEJEJEJE)",
+          backFooter: "MANUSCRITO ORIGINAL // SIN FINAL"
+        }
+      ],
+
+      scene3_spy: [
+        {
+          id: "sx-01",
+          image: "./imagenes/img-7.jpg",
+          stamp: "[CONFIDENCIAL: CÓMPLICE #01]",
+          censorPrefix: "Sujeto captado robando ",
+          censorHidden: "todos mis pensamientos",
+          censorSuffix: " en Berlín Este.",
+          backTitle: "EXPEDIENTE: UN ROBO SIN ARMAS",
+          backText: "Informe oficial de la agencia WISE: MUJER DE ALTO RIESGO (Sujeto #01 NO SE DEJA OLER LOS PIES), capaz de robarme el corazón y la mente sin disparar un solo tiro.",
+          backFooter: "CLASIFICACIÓN: NIVEL DIAMANTE"
+        },
+        {
+          id: "sx-02",
+          image: "./imagenes/img-8.jpg",
+          stamp: "[OPERACIÓN: VIDA JUNTOS (AMENAZA)]",
+          censorPrefix: "Alianza estratégica con ",
+          censorHidden: "una fresa muy dulce y peligrosa",
+          censorSuffix: " confirmado.",
+          backTitle: "OPERACIÓN: HOGAR SECRETO O NO TAN SECRETO",
+          backText: "INSTRUCCIONES: Mantener la paz mundial y al amor de mi vida a salvo, sin importar que costo adquiera. (PD: No se aceptan devoluciones ni reembolsos).",
+          backFooter: "OPERACIÓN STRIX // FASE ETERNA"
+        },
+        {
+          id: "sx-03",
+          image: "./imagenes/img-9.jpg",
+          stamp: "[PRIORIDAD: MÁXIMA]",
+          censorPrefix: "Objetivo prioritario: ",
+          censorHidden: "proteger a mi compañera de vida",
+          censorSuffix: " sin excepción.",
+          backTitle: "DIRECTIVA DE ALTO MANDO",
+          backText: "Se autoriza que el agente Mar-Azul (Sujeto #01) pueda acceder a todos los archivos de la agencia WISE, incluyendo el archivo central de OSTANIA, para proteger a su cómplice y amor de vida.",
+          backFooter: "ARCHIVO CENTRAL // OSTANIA"
+        }
+      ],
+
+      scene4_bella: [
+        {
+          id: "bb-01",
+          image: "./imagenes/img-10.jpg",
+          plaque: "I. El Salón Dorado",
+          backTitle: "I. Como una Canción Antigua",
+          backText: "A tu lado comprendi que la magia si existe y que no es como en los cuentos de hadas, es mejor y comenzamos a crearla con cada abrazo, cada besito y cada agarradita de belly MUEJEJEJE",
+          backFooter: "PRÓLOGO EN VITRAL // LÁMINA I"
+        },
+        {
+          id: "bb-02",
+          image: "./imagenes/img-11.jpg",
+          plaque: "II. La Rosa",
+          backTitle: "II. Antes del Último Pétalo",
+          backText: "No necesito que el tiempo se detenga, solo que cada pétalo que caiga me encuentre amándote más que el anterior y que cada día que pase me encuentre más enamorado de ti.",
+          backFooter: "PIEZA MAESTRA // LÁMINA II"
+        },
+        {
+          id: "bb-03",
+          image: "./imagenes/img-12.jpg",
+          plaque: "III. Nuestro Propio Reino",
+          backTitle: "III. El Baile que Nunca Termina",
+          backText: "hay que bailar juntos hasta el fin de los tiempos, cuando la música se detenga, cuando el reloj deje de girar y cuando el mundo deje de girar, porque a tu lado encontré mi hogar y mi lugar en el mundo. pd: y si me dejas en un futuro, quiero bailar contigo y una familia  hasta que se acabe el mundo MUEJEJEJE",
+          backFooter: "EPÍLOGO REAL // LÁMINA III"
+        }
+      ],
+
+      finalLetter: {
+        title: "Feliz Cumpleaños, Mi Fressy 🍓",
+        paragraphs: [
+          "Amorcitoooooo, hoy es un dia mega mega especial porque celebramos no solo un año mas que estas vivita y coliando sino que cumples tu MAYORIA DE EDAD OMGGG",
+          "y quiero que sepas que te amo con todo mi corazoncito y con todo lo que soy. que eres la persona mas importante y que alegras todos mis dias. mi cuchurrumina esto es solo una pequeña muestra de todo lo que siento por ti y de todo lo que quiero compartir contigo.",
+          "gracias por ser mi compañera de vida, por hacerme reir, por apoyarme en todo y por ser la mejor persona que conozco en todo el fakin world MUEJEJEJE. espero que este dia sea tan especial como tu y que todos tus deseos se hagan realidad.",
+          "te amo con todo mi corazoncito y con todo lo que soy. feliz cumpleaños, mi amor. que este nuevo año de vida te traiga mucha felicidad, amor y exito en todo lo que te propongas. y recuerda que siempre estare a tu lado para apoyarte y amarte en cada paso del camino. te amo mucho, mi fressy hermosa."
+        ],
+        signature: "pd: TE AMOOOOO MI CUCHURRUMINA, MI FRESSY, MI AMORCITO, MI VIDA ENTERA, MI TODO. MUEJEJEJE"
+      }
+    };
+
+    /**
+     * =========================================================================
+     * 2. GENERADOR DE ARTE SVG DE RESPALDO (PARA QUE NUNCA FALLE UNA IMAGEN)
+     * =========================================================================
+     */
+    function createFallbackArtwork(title, paletteBg, accentColor) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 800">
+        <rect width="450" height="800" fill="${paletteBg}"/>
+        <rect x="28" y="28" width="394" height="744" fill="none" stroke="${accentColor}" stroke-width="3"/>
+        <circle cx="225" cy="360" r="110" fill="none" stroke="${accentColor}" stroke-width="2" stroke-dasharray="8 6"/>
+        <text x="225" y="365" text-anchor="middle" font-family="Georgia" font-size="22" fill="${accentColor}">${title}</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    /**
+     * =========================================================================
+     * 3. RENDERIZADO DINÁMICO DE LAS 12 TARJETAS 9:16 DESDE ALBUM_DATA
+     * =========================================================================
+     */
+    // Normaliza rutas locales que empiecen con "/" (ej. "/imagenes/...") a "./imagenes/..."
+    // para que funcionen al abrir index.html directamente desde la carpeta (file://) o en subcarpetas.
+    function resolveImagePath(src) {
+      if (!src) return "";
+      return src.replace(/^\/(?!\/)/, "./");
+    }
+
+    function renderAllSceneCards() {
+      // ESCENA 1: TOKYO REVENGERS
+      const s1Container = document.getElementById("cards-scene-1");
+      ALBUM_DATA.scene1_tokyo.forEach((item, idx) => {
+        const fallback = createFallbackArtwork(item.title, "#141414", "#c59b27");
+        const slot = document.createElement("div");
+        slot.className = "photo-card-slot";
+        slot.dataset.scene = "1";
+        slot.dataset.index = idx;
+        slot.innerHTML = `
+          <div class="photo-card-rig">
+            <div class="card-face card-front tr-card-front">
+              <div class="tr-card-inner-gold">
+                <div class="tr-chapter-tag">${item.tag}</div>
+                <div class="card-img-wrap">
+                  <img src="${resolveImagePath(item.image)}" alt="${item.title}" onerror="this.onerror=null;this.src='${fallback}';" />
+                </div>
+                <div class="tr-caption-strip">
+                  <h4>${item.title}</h4>
+                  <p>${item.subtitle}</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-face card-back tr-card-back">
+              <div class="tr-back-header">
+                <span>東京卍</span>
+                <span style="font-size:11px; font-family:'IBM Plex Mono', monospace;">9:16 // ARCHIVO</span>
+              </div>
+              <div class="tr-back-body">
+                <h3>${item.backTitle}</h3>
+                <p>${item.backText}</p>
+              </div>
+              <div class="tr-back-footer">${item.backFooter}</div>
+            </div>
+          </div>
+        `;
+        s1Container.appendChild(slot);
+      });
+
+      // ESCENA 2: ESCRITURA
+      const s2Container = document.getElementById("cards-scene-2");
+      ALBUM_DATA.scene2_escritura.forEach((item, idx) => {
+        const fallback = createFallbackArtwork(item.date, "#f3ead7", "#1c2a4a");
+        const slot = document.createElement("div");
+        slot.className = "photo-card-slot";
+        slot.dataset.scene = "2";
+        slot.dataset.index = idx;
+        slot.innerHTML = `
+          <div class="photo-card-rig">
+            <div class="card-face card-front es-card-front">
+              <span class="es-date">${item.date}</span>
+              <!-- Foto revelada pegada con cinta washi -->
+              <div class="es-photo-frame">
+                <span class="es-tape tl"></span>
+                <span class="es-tape tr"></span>
+                <div class="card-img-wrap">
+                  <img src="${resolveImagePath(item.image)}" alt="${item.caption}" onerror="this.onerror=null;this.src='${fallback}';" />
+                </div>
+              </div>
+              <p class="es-caption">${item.caption}</p>
+              <!-- Mancha de tinta decorativa -->
+              <svg class="es-ink-blot" viewBox="0 0 34 30">
+                <path d="M14,4 C20,2 26,6 25,12 C30,13 31,20 26,22 C24,28 15,28 12,24 C6,25 3,19 7,15 C4,10 9,5 14,4 Z" fill="#1c2a4a" opacity="0.8"/>
+                <circle cx="30" cy="6" r="2" fill="#1c2a4a" opacity="0.7"/>
+                <circle cx="4" cy="27" r="1.5" fill="#1c2a4a" opacity="0.6"/>
+              </svg>
+              <span class="es-page-num">— pág. ${item.page} —</span>
+            </div>
+
+            <div class="card-face card-back es-card-back">
+              <div>
+                <div class="es-back-date">${item.date}</div>
+                <h3>${item.backTitle}</h3>
+                <p>${item.backText}</p>
+              </div>
+              <div class="es-back-sign">${item.backSignature}</div>
+              <div class="es-back-footer">
+                <span>${item.backFooter}</span>
+                <span class="es-wax-dot"></span>
+              </div>
+            </div>
+          </div>
+        `;
+        s2Container.appendChild(slot);
+      });
+
+      // ESCENA 3: SPY X FAMILY
+      const s3Container = document.getElementById("cards-scene-3");
+      ALBUM_DATA.scene3_spy.forEach((item, idx) => {
+        const fallback = createFallbackArtwork(item.stamp, "#14261f", "#b89958");
+        const slot = document.createElement("div");
+        slot.className = "photo-card-slot";
+        slot.dataset.scene = "3";
+        slot.dataset.index = idx;
+        slot.innerHTML = `
+          <div class="photo-card-rig">
+            <div class="card-face card-front sx-card-front">
+              <!-- Alfiler de conexión del hilo rojo -->
+              <span class="sx-pushpin"></span>
+              <!-- Clip metálico realista en SVG -->
+              <svg class="sx-paperclip" viewBox="0 0 28 62">
+                <path d="M8,46 L8,12 C8,5 20,5 20,12 L20,48 C20,56 4,56 4,48 L4,18"
+                      fill="none" stroke="#6c757d" stroke-width="3.2" stroke-linecap="round"/>
+                <path d="M9,45 L9,12 C9,6 19,6 19,12 L19,48"
+                      fill="none" stroke="#ced4da" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+
+              <div class="sx-darkroom-print">
+                <div class="card-img-wrap">
+                  <img src="${resolveImagePath(item.image)}" alt="${item.stamp}" onerror="this.onerror=null;this.src='${fallback}';" />
+                </div>
+              </div>
+
+              <div class="sx-red-stamp">${item.stamp}</div>
+
+              <div class="sx-typewriter-notes">
+                ${item.censorPrefix}<span class="censor-bar">${item.censorHidden}</span>${item.censorSuffix}
+              </div>
+            </div>
+
+            <div class="card-face card-back sx-card-back">
+              <div>
+                <div class="sx-back-stamp">DESCLASIFICADO // WISE</div>
+                <h3>${item.backTitle}</h3>
+              </div>
+              <p>${item.backText}</p>
+              <div class="sx-back-meta">
+                <span>AGENTE: TWILIGHT-LOVE</span>
+                <span>${item.backFooter}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        s3Container.appendChild(slot);
+      });
+
+      // ESCENA 4: LA BELLA Y LA BESTIA
+      const s4Container = document.getElementById("cards-scene-4");
+      ALBUM_DATA.scene4_bella.forEach((item, idx) => {
+        const fallback = createFallbackArtwork(item.plaque, "#091124", "#c9a24d");
+        const slot = document.createElement("div");
+        slot.className = "photo-card-slot";
+        slot.dataset.scene = "4";
+        slot.dataset.index = idx;
+        slot.innerHTML = `
+          <div class="photo-card-rig">
+            <div class="card-face card-front bb-card-front">
+              <div class="bb-vitral-arch-inner">
+                <!-- Entramado superior de plomo de vitral -->
+                <svg class="bb-lead-tracery" viewBox="0 0 230 135" preserveAspectRatio="none">
+                  <path d="M0,0 L230,0 L230,85 Q115,15 0,85 Z" fill="rgba(74, 14, 30, 0.36)" stroke="#111111" stroke-width="4"/>
+                  <line x1="115" y1="0" x2="115" y2="52" stroke="#111111" stroke-width="4"/>
+                  <circle cx="115" cy="26" r="14" fill="rgba(201, 162, 77, 0.45)" stroke="#111111" stroke-width="3.5"/>
+                </svg>
+                <div class="card-img-wrap">
+                  <img src="${resolveImagePath(item.image)}" alt="${item.plaque}" onerror="this.onerror=null;this.src='${fallback}';" />
+                </div>
+              </div>
+              <div class="bb-card-plaque">${item.plaque}</div>
+            </div>
+
+            <div class="card-face card-back bb-card-back">
+              <h3>${item.backTitle}</h3>
+              <p>${item.backText}</p>
+              <div class="bb-back-footer">${item.backFooter}</div>
+            </div>
+          </div>
+        `;
+        s4Container.appendChild(slot);
+      });
+
+      // Renderizar Carta de Cumpleaños Final
+      document.getElementById("letter-title").textContent = ALBUM_DATA.finalLetter.title;
+      const letterBody = document.getElementById("letter-body");
+      letterBody.innerHTML = ALBUM_DATA.finalLetter.paragraphs.map(p => `<p>${p}</p>`).join("");
+      document.getElementById("letter-signature").textContent = ALBUM_DATA.finalLetter.signature;
+    }
+
+    renderAllSceneCards();
+
+    /**
+     * =========================================================================
+     * 4. INTERACCIÓN FÍSICA 3D EN TARJETAS 9:16 (ZOOM DE CÁMARA + GIRO 180°)
+     * =========================================================================
+     */
+    const cameraFocusOffset = { x: 0, y: 0, z: 0 };
+
+    function resetAllFlippedCards() {
+      document.querySelectorAll(".photo-card-slot.is-flipped").forEach(card => {
+        card.classList.remove("is-flipped");
+      });
+      gsap.to(cameraFocusOffset, {
+        x: 0,
+        y: 0,
+        z: 0,
+        duration: 0.75,
+        ease: "power3.out"
+      });
+    }
+
+    document.querySelectorAll(".photo-card-slot").forEach(slot => {
+      slot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const wasFlipped = slot.classList.contains("is-flipped");
+        resetAllFlippedCards();
+
+        if (!wasFlipped) {
+          slot.classList.add("is-flipped");
+          // Calcular desplazamiento lateral según cuál de las 3 tarjetas fue pulsada (0: izq, 1: centro, 2: der)
+          const idx = parseInt(slot.dataset.index, 10);
+          const targetOffsetX = (1 - idx) * 145;
+          gsap.to(cameraFocusOffset, {
+            x: targetOffsetX,
+            y: 0,
+            z: 130,
+            duration: 0.85,
+            ease: "power3.out"
+          });
+        }
+      });
+    });
+
+    document.addEventListener("click", () => {
+      resetAllFlippedCards();
+    });
+
+    /**
+     * =========================================================================
+     * 5. MOTOR DE CÁMARA EN EJE Z (LENIS + GSAP SCROLLTRIGGER + MOUSE LERP)
+     * =========================================================================
+     */
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Inicializar Lenis para inercia cinematográfica suave
+    const lenis = new Lenis({
+      duration: 1.35,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true
+    });
+
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    // Estado centralizado del Mundo 3D y de la Cámara Steadicam
+    const cameraState = {
+      worldZ: 0,       // Avanza de 0px a +10000px acercándose a las escenas
+      worldX: 0,       // Paneo horizontal sutil
+      worldY: 0,       // Paneo vertical sutil
+      camRotX: 0,      // Inclinación steadicam X
+      camRotY: 0,      // Inclinación steadicam Y
+      camRotZ: 0       // Inclinación steadicam Z (roll cinematográfico)
+    };
+
+    // Estado de Parallax Reactivo del Cursor (interpolado con lerp)
+    const mouseParallax = {
+      targetX: 0,
+      targetY: 0,
+      currentX: 0,
+      currentY: 0
+    };
+
+    window.addEventListener("mousemove", (e) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = (e.clientY / window.innerHeight) * 2 - 1;
+      mouseParallax.targetX = nx;
+      mouseParallax.targetY = ny;
+    });
+
+    const worldEl = document.getElementById("world");
+    const cameraRigEl = document.getElementById("camera-rig");
+    const hudZText = document.getElementById("hud-z-text");
+    const hudNavBtns = document.querySelectorAll(".hud-nav-btn");
+
+    // Referencias a las 5 escenas y placas de fondo para visibilidad eficiente
+    const sceneEls = [
+      document.getElementById("scene-0"),
+      document.getElementById("scene-1"),
+      document.getElementById("scene-2"),
+      document.getElementById("scene-3"),
+      document.getElementById("scene-4")
+    ];
+    const sceneBaseZ = [0, -2500, -5000, -7500, -10000];
+
+    const bgPlates = [
+      document.getElementById("bg-scene-0"),
+      document.getElementById("bg-scene-1"),
+      document.getElementById("bg-scene-2"),
+      document.getElementById("bg-scene-3"),
+      document.getElementById("bg-scene-4")
+    ];
+
+    /**
+     * Timeline Maestro de Cámara en el Eje Z con "Hold Phases" (mesetas donde la cámara
+     * frena suavemente frente a las 3 fotos 9:16 de cada escena) y Saltos Espaciales.
+     */
+    const masterTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#scroll-proxy",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5,
+        onUpdate: () => {
+          // Si el usuario hace scroll mientras una tarjeta está girada, se pliega suavemente
+          if (document.querySelector(".photo-card-slot.is-flipped")) {
+            resetAllFlippedCards();
+          }
+        }
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // TRAMO 0 ➔ 1: PORTAL DE ENTRADA (Z: 0) HASTA TOKYO REVENGERS (Z: -2500px)
+    // -------------------------------------------------------------------------
+    masterTimeline
+      // Las palabras "FELIZ" y "CUMPLEAÑOS" se abren hacia los lados mientras la cámara las atraviesa
+      .to("#intro-word-left",  { x: -320, z: 380, opacity: 0, duration: 1.6, ease: "power2.in" }, 0)
+      .to("#intro-word-right", { x: 320,  z: 380, opacity: 0, duration: 1.6, ease: "power2.in" }, 0)
+      .to(["#intro-kicker", "#intro-sub", "#intro-cue"], { opacity: 0, z: 260, duration: 1.1 }, 0)
+      // Dolly-In por el callejón de viñetas de manga hacia Z: 2470
+      .to(cameraState, {
+        worldZ: 2470,
+        worldX: -18,
+        camRotZ: -1.4,
+        camRotY: 1.2,
+        duration: 2.4,
+        ease: "power2.inOut"
+      }, 0)
+
+      // HOLD PHASE 1 (Meseta en Escena 1: Tokyo Revengers, Z ~ 2500px)
+      // La cámara frena suavemente para admirar e interactuar con las 3 fotos 9:16
+      .to(cameraState, {
+        worldZ: 2535,
+        worldX: 0,
+        camRotZ: 0,
+        camRotY: 0,
+        duration: 1.8,
+        ease: "none"
+      }, 2.4)
+      // El engranaje del reloj roto y sus manecillas giran hacia atrás (viaje en el tiempo)
+      .to("#tr-clock-hands", { rotation: -420, transformOrigin: "300px 300px", duration: 4.2, ease: "none" }, 0.8)
+      .to("#tr-gear-outer",  { rotation: 140,  transformOrigin: "300px 300px", duration: 4.2, ease: "none" }, 0.8)
+
+      // -----------------------------------------------------------------------
+      // SALTO DE CÁMARA 1 ➔ 2 (Z: -2500px a -5000px):
+      // Las viñetas de manga se abren hacia los lados y la cámara atraviesa el reloj
+      // -----------------------------------------------------------------------
+      .to("#tr-wing-left",  { x: -340, duration: 1.6, ease: "power2.in" }, 4.2)
+      .to("#tr-wing-right", { x: 340,  duration: 1.6, ease: "power2.in" }, 4.2)
+      .to("#tr-mid-layer",  { scale: 1.25, opacity: 0, duration: 1.3, ease: "power2.in" }, 4.25)
+      .to(cameraState, {
+        worldZ: 4970,
+        worldY: 14,
+        camRotX: 1.6,
+        camRotZ: 1.2,
+        duration: 2.5,
+        ease: "power2.inOut"
+      }, 4.2)
+
+      // HOLD PHASE 2 (Meseta en Escena 2: Escritura, Z ~ 5000px)
+      .to(cameraState, {
+        worldZ: 5035,
+        worldY: 0,
+        camRotX: 0,
+        camRotZ: 0,
+        duration: 1.8,
+        ease: "none"
+      }, 6.7)
+      // La firma y el corazón del manuscrito se escriben solos con tinta mientras la cámara llega
+      .fromTo(".es-ink-stroke",
+        { strokeDashoffset: 1 },
+        { strokeDashoffset: 0, duration: 2.2, stagger: 0.5, ease: "power1.inOut" }, 5.6)
+
+      // -----------------------------------------------------------------------
+      // SALTO DE CÁMARA 2 ➔ 3 (Z: -5000px a -7500px):
+      // Las páginas del gran manuscrito se abren de par en par, las plumas se
+      // apartan y la cámara baja ligeramente su ángulo (rotateX) entrando en la oficina WISE años 60
+      // -----------------------------------------------------------------------
+      .to("#es-pen-left",   { x: -260, rotation: -10, duration: 1.6, ease: "power2.in" }, 8.5)
+      .to("#es-pen-right",  { x: 260,  rotation: 10,  duration: 1.6, ease: "power2.in" }, 8.5)
+      .to("#es-mid-layer",  { opacity: 0, z: 260, duration: 1.2, ease: "power2.in" }, 8.5)
+      .to("#es-page-left",  { rotationY: -78, x: -160, duration: 2.0, ease: "power2.inOut" }, 8.4)
+      .to("#es-page-right", { rotationY: 78,  x: 160,  duration: 2.0, ease: "power2.inOut" }, 8.4)
+      .to(cameraState, {
+        worldZ: 7470,
+        worldX: 16,
+        camRotX: -2.2,
+        camRotZ: -1.1,
+        duration: 2.5,
+        ease: "power2.inOut"
+      }, 8.5)
+
+      // HOLD PHASE 3 (Meseta en Escena 3: Spy x Family, Z ~ 7500px)
+      .to(cameraState, {
+        worldZ: 7535,
+        worldX: 0,
+        camRotX: -0.6,
+        camRotZ: 0,
+        duration: 1.8,
+        ease: "none"
+      }, 11.0)
+
+      // -----------------------------------------------------------------------
+      // SALTO DE CÁMARA 3 ➔ 4 (Z: -7500px a -10000px):
+      // Las carpetas del expediente se abren dando paso al salón de vitral gótico
+      // -----------------------------------------------------------------------
+      .to("#sx-wing-left",  { x: -280, rotation: -12, duration: 1.6, ease: "power2.in" }, 12.8)
+      .to("#sx-wing-right", { x: 280,  rotation: 12,  duration: 1.6, ease: "power2.in" }, 12.8)
+      .to("#sx-mid-layer",  { opacity: 0, z: 280, duration: 1.3, ease: "power2.in" }, 12.85)
+      .to(cameraState, {
+        worldZ: 9965,
+        worldX: 0,
+        worldY: 0,
+        camRotX: 1.4,
+        camRotZ: 0.8,
+        duration: 2.5,
+        ease: "power2.inOut"
+      }, 12.8)
+
+      // HOLD PHASE 4 (Meseta Final en Escena 4: La Bella y la Bestia, Z = 10000px)
+      .to(cameraState, {
+        worldZ: 10000,
+        camRotX: 0,
+        camRotY: 0,
+        camRotZ: 0,
+        duration: 1.8,
+        ease: "power2.out"
+      }, 15.3);
+
+    /**
+     * Animación continua con gravedad lenta y natural para los pétalos de la rosa
+     * en la Escena 4 (La Bella y la Bestia).
+     */
+    gsap.utils.toArray(".falling-petal").forEach((petal, i) => {
+      gsap.fromTo(
+        petal,
+        { y: -35, x: 0, rotation: -12, opacity: 0 },
+        {
+          y: 85,
+          x: i % 2 === 0 ? 18 : -18,
+          rotation: 24,
+          opacity: 1,
+          duration: 5.5 + i * 1.4,
+          repeat: -1,
+          yoyo: false,
+          ease: "sine.inOut",
+          delay: i * 1.6
+        }
+      );
+    });
+
+    /**
+     * =========================================================================
+     * 6. LOOP DE RENDERIZADO 3D EN TIEMPO REAL (60FPS) + GESTIÓN DE PROFUNDIDAD
+     * =========================================================================
+     */
+    function updateSpatialEngine() {
+      // Interpolación suave (lerp) del ratón para la rotación de la cámara
+      mouseParallax.currentX += (mouseParallax.targetX - mouseParallax.currentX) * 0.065;
+      mouseParallax.currentY += (mouseParallax.targetY - mouseParallax.currentY) * 0.065;
+
+      const totalRotY = cameraState.camRotY + mouseParallax.currentX * 3.2;
+      const totalRotX = cameraState.camRotX - mouseParallax.currentY * 2.4;
+      const totalRotZ = cameraState.camRotZ;
+
+      // Aplicar rotación Steadicam + Mouse Parallax al Rig de Cámara
+      cameraRigEl.style.transform = `
+        rotateX(${totalRotX.toFixed(3)}deg)
+        rotateY(${totalRotY.toFixed(3)}deg)
+        rotateZ(${totalRotZ.toFixed(3)}deg)
+      `;
+
+      // Aplicar traslación espacial Z + Offset de Zoom de Tarjeta al Mundo 3D
+      const finalX = cameraState.worldX + cameraFocusOffset.x - mouseParallax.currentX * 26;
+      const finalY = cameraState.worldY + cameraFocusOffset.y - mouseParallax.currentY * 18;
+      const finalZ = cameraState.worldZ + cameraFocusOffset.z;
+
+      worldEl.style.transform = `translate3d(${finalX.toFixed(2)}px, ${finalY.toFixed(2)}px, ${finalZ.toFixed(2)}px)`;
+
+      // Actualizar lectura HUD en tiempo real
+      const zDisplay = -Math.round(cameraState.worldZ);
+      hudZText.textContent = `Z: ${zDisplay} PX`;
+
+      // Determinar escena dominante según cercanía en el Eje Z y gestionar visibilidad/opacidad
+      let closestSceneIdx = 0;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < sceneEls.length; i++) {
+        // Posición relativa de la escena respecto a la cámara:
+        // Si relativeZ === 0, la escena está exactamente en el plano focal de la cámara.
+        const relativeZ = sceneBaseZ[i] + cameraState.worldZ;
+        const absDist = Math.abs(relativeZ);
+
+        if (absDist < minDistance) {
+          minDistance = absDist;
+          closestSceneIdx = i;
+        }
+
+        // Visibilidad espacial en el túnel 3D:
+        // Visible desde 2750px por delante hasta 750px por detrás de la cámara
+        if (relativeZ > -2750 && relativeZ < 780) {
+          sceneEls[i].style.visibility = "visible";
+          // Fade de entrada desde el fondo del túnel y fade de salida al rebasar la cámara
+          let sceneAlpha = 1;
+          if (relativeZ < -1850) {
+            sceneAlpha = Math.max(0, 1 - (Math.abs(relativeZ) - 1850) / 900);
+          } else if (relativeZ > 360) {
+            sceneAlpha = Math.max(0, 1 - (relativeZ - 360) / 420);
+          }
+          sceneEls[i].style.opacity = sceneAlpha.toFixed(3);
+          sceneEls[i].style.pointerEvents = absDist < 650 ? "auto" : "none";
+        } else {
+          sceneEls[i].style.visibility = "hidden";
+          sceneEls[i].style.opacity = "0";
+          sceneEls[i].style.pointerEvents = "none";
+        }
+
+        // Sincronizar la opacidad de la placa material de fondo de cada universo
+        const bgAlpha = Math.max(0, 1 - absDist / 1650);
+        bgPlates[i].style.opacity = bgAlpha.toFixed(3);
+      }
+
+      // Actualizar botón activo en el HUD inferior
+      hudNavBtns.forEach((btn, idx) => {
+        btn.classList.toggle("active", idx === closestSceneIdx);
+      });
+
+      requestAnimationFrame(updateSpatialEngine);
+    }
+
+    requestAnimationFrame(updateSpatialEngine);
+
+    /**
+     * =========================================================================
+     * 7. NAVEGACIÓN DIRECTA EN EL EJE Z (HUD) Y MODAL DE CARTA REAL
+     * =========================================================================
+     */
+    hudNavBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        resetAllFlippedCards();
+        const progress = parseFloat(btn.dataset.targetProgress);
+        const maxScroll = document.getElementById("scroll-proxy").offsetHeight - window.innerHeight;
+        lenis.scrollTo(maxScroll * progress, { duration: 2.2 });
+      });
+    });
+
+    // Apertura y cierre del Pliego de Pergamino Final (Escena 4)
+    const letterModal = document.getElementById("royal-letter-modal");
+    const openLetterBtn = document.getElementById("open-letter-btn");
+    const closeLetterBtn = document.getElementById("close-letter-btn");
+    const rewindJourneyBtn = document.getElementById("rewind-journey-btn");
+
+    openLetterBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      resetAllFlippedCards();
+      letterModal.classList.add("is-open");
+      letterModal.setAttribute("aria-hidden", "false");
+    });
+
+    closeLetterBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      letterModal.classList.remove("is-open");
+      letterModal.setAttribute("aria-hidden", "true");
+    });
+
+    rewindJourneyBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      letterModal.classList.remove("is-open");
+      letterModal.setAttribute("aria-hidden", "true");
+      lenis.scrollTo(0, { duration: 3.2 });
+    });
+  </script>
+</body>
+</html>
